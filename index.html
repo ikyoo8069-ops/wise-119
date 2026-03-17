@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>재난톡 · 119tok</title>
+  <meta name="description" content="재난안전 전문가 연결 플랫폼 — 온톨로지 기반 AI 분석">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚨</text></svg>">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #0a0f1e; font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script type="text/babel" data-presets="react">
+const { useState, useRef, useEffect } = React;
+
+// ─── 4대 재난 온톨로지 KB ──────────────────────────────────────────
+const DISASTER_KB = {
+  홍수: {
+    icon:"🌊", color:"#06b6d4", grad:"linear-gradient(135deg,#0891b2,#0e7490)",
+    keywords:["홍수","침수","하천","제방","배수","범람","수해","물난리"],
+    summary:"홍수 피해는 강우강도 초과, 배수시설 불량, 하천 관리 미흡이 주요 원인입니다.",
+    actions:["🚨 저지대·지하공간 즉시 대피","📱 119·지자체 재난신고","🚗 침수 도로·지하차도 진입 금지","⚡ 전기·가스 차단 후 대피","📢 이웃·노약자 대피 안내"],
+    measures:[
+      {action:"🔍 원인 파악: 제방 붕괴 / 배수 불량 / 하천 월류 구분",law:"재난 및 안전관리 기본법 제14조",lawdesc:"시장·군수·구청장의 재난 상황 파악 의무"},
+      {action:"🚧 위험 구역 통제선 설치 및 주민 대피 유도",law:"자연재해대책법 제18조",lawdesc:"재난예방을 위한 대피명령 권한"},
+      {action:"💧 긴급 배수펌프 투입 — 침수 피해 확산 차단",law:"자연재해대책법 제22조",lawdesc:"풍수해위험지구 정비사업 시행"},
+      {action:"📋 피해 현황 실시간 기록·보고",law:"재난 및 안전관리 기본법 제20조",lawdesc:"재난 상황 보고 및 공개 의무"},
+      {action:"🏗️ 제방 긴급 보강 및 복구",law:"하천법 제74조",lawdesc:"홍수관리구역 내 시설 관리 책임"},
+    ],
+    experts:[{c:"제방 붕괴·하천",e:"수자원개발기술사"},{c:"배수·하수 역류",e:"상하수도기술사"},{c:"도로 침수",e:"도로및공항기술사"},{c:"복합·토석류",e:"방재기술사"}],
+    rnd:["AI 기반 실시간 침수 예측·조기경보 시스템","기후변화 대응 도시 홍수 리질리언스 강화","IoT 센서망 하천 수위 자동 모니터링"],
+    patents:[
+      {no:"KR10-2023-0087432",title:"AI 기반 도시 침수 예측 및 조기경보 시스템",applicant:"한국건설기술연구원",year:2023,expert:"수자원개발기술사"},
+      {no:"KR10-2022-0145231",title:"IoT 센서를 이용한 하천 수위 실시간 모니터링 장치",applicant:"한국수자원공사",year:2022,expert:"수자원개발기술사"},
+      {no:"KR10-2021-0098754",title:"머신러닝 기반 제방 붕괴 위험도 평가 방법",applicant:"한국방재협회",year:2021,expert:"방재기술사"},
+      {no:"KR10-2020-0112345",title:"딥러닝 기반 강우-유출 모형 정확도 향상 기술",applicant:"기상청",year:2020,expert:"수자원개발기술사"},
+      {no:"KR10-2023-0056789",title:"드론 기반 하천 제방 균열 자동 탐지 시스템",applicant:"한국수자원공사",year:2023,expert:"토목구조기술사"},
+      {no:"KR10-2022-0098321",title:"스마트 배수펌프장 자동 제어 및 원격 모니터링 장치",applicant:"환경부",year:2022,expert:"상하수도기술사"},
+      {no:"KR10-2021-0134509",title:"지하차도 침수 감지 및 자동 차단 시스템",applicant:"국토교통부",year:2021,expert:"도로및공항기술사"},
+      {no:"KR10-2020-0087001",title:"위성영상 기반 홍수 피해 면적 산정 자동화 기술",applicant:"국립재난안전연구원",year:2020,expert:"방재기술사"},
+      {no:"KR10-2019-0123456",title:"하천 유량 실시간 측정을 위한 초음파 유속계 시스템",applicant:"한국건설기술연구원",year:2019,expert:"수자원개발기술사"},
+      {no:"KR10-2023-0201234",title:"AI 기반 도시 내수침수 취약지역 자동 분류 시스템",applicant:"한국환경연구원",year:2023,expert:"상하수도기술사"},
+    ],
+    papers:[
+      {title:"기후변화를 고려한 도시 침수 취약성 평가 모델 개발",journal:"한국방재학회논문집",year:2024,authors:"김○○ 외 3인",expert:"수자원개발기술사"},
+      {title:"딥러닝 기반 홍수 피해 예측 정확도 향상 연구",journal:"대한토목학회논문집",year:2023,authors:"이○○ 외 2인",expert:"방재기술사"},
+      {title:"도시하천 제방의 붕괴 메커니즘 분석 및 대책",journal:"한국수자원학회논문집",year:2023,authors:"박○○ 외 4인",expert:"토목구조기술사"},
+      {title:"IoT 기반 실시간 수위 모니터링과 홍수 조기경보 연계 연구",journal:"한국방재학회논문집",year:2022,authors:"최○○ 외 3인",expert:"수자원개발기술사"},
+      {title:"기상 레이더 자료를 이용한 도시 침수 예측 정확도 향상",journal:"대기",year:2022,authors:"정○○ 외 2인",expert:"방재기술사"},
+      {title:"하천 제방 붕괴 원인 분석 및 보강 공법 최적화",journal:"한국지반공학회논문집",year:2021,authors:"한○○ 외 4인",expert:"토목시공기술사"},
+      {title:"도시 하수관거 역류 방지 시스템 설계 기준 연구",journal:"한국수자원학회논문집",year:2021,authors:"오○○ 외 2인",expert:"상하수도기술사"},
+    ],
+    laws:[
+      {name:"자연재해대책법",article:"제22조 (풍수해위험지구 정비사업)"},
+      {name:"하천법",article:"제74조 (홍수관리구역 지정·관리)"},
+      {name:"급경사지 재해예방에 관한 법률",article:"제4조 (급경사지 관리)"},
+      {name:"재난 및 안전관리 기본법",article:"제14조 (재난관리책임기관의 장의 책무)"},
+      {name:"소하천정비법",article:"제8조 (소하천 정비 시행계획 수립)"},
+      {name:"도로법",article:"제32조 (도로관리청의 도로 유지·관리 의무)"},
+      {name:"하수도법",article:"제4조 (하수도 정비 기본계획)"},
+      {name:"국토의 계획 및 이용에 관한 법률",article:"제37조 (방재지구 지정)"},
+      {name:"댐건설 및 주변지역지원 등에 관한 법률",article:"제21조 (댐 안전 점검)"},
+    ],
+  },
+  화재: {
+    icon:"🔥", color:"#f43f5e", grad:"linear-gradient(135deg,#e11d48,#be123c)",
+    keywords:["화재","불","연기","소방","방화","피난","스프링클러","발화"],
+    summary:"화재 피해 확대는 방화구획 미흡, 감지·경보 지연, 피난 체계 부실이 주요 원인입니다.",
+    actions:["🚨 즉시 대피 — 엘리베이터 금지","📱 119 신고","🔥 초기 진화 30초 원칙","🚪 문 닫고 대피","🏃 낮은 자세로 이동"],
+    measures:[
+      {action:"🔍 발화 원인 파악 — 전기·가스·방화·화학물질 구분",law:"화재조사 및 보고규정 제4조",lawdesc:"소방관서장의 화재 원인 조사 의무"},
+      {action:"🚧 화재 구역 통제 및 인명 구조 우선",law:"소방기본법 제24조",lawdesc:"소방활동 방해 금지 및 강제처분"},
+      {action:"💨 제연 설비·환기 시스템 작동 확인",law:"건축물의 피난·방화구조 기준 제14조",lawdesc:"방화구획 및 제연 설비 기준"},
+      {action:"📋 건물 구조도 소방대 즉시 전달",law:"소방시설 설치 및 관리에 관한 법률 제12조",lawdesc:"소방시설 현황 제공 의무"},
+      {action:"⚡ 전기·가스 메인 차단",law:"화재의 예방 및 안전관리에 관한 법률 제9조",lawdesc:"소방안전관리자의 긴급 차단 권한"},
+    ],
+    experts:[{c:"피난·연기제어",e:"소방기술사"},{c:"소화설비·방화구획",e:"건축기계설비기술사"},{c:"터널·도로 화재",e:"교통기술사"},{c:"복합·지하공간",e:"방재기술사"}],
+    rnd:["AI 영상분석 기반 화재 조기 감지 시스템","디지털 트윈 기반 피난 시뮬레이션 플랫폼","초고층·지하공간 복합재난 소방 기술"],
+    patents:[
+      {no:"KR10-2023-0112847",title:"딥러닝 기반 CCTV 영상 화재 조기감지 시스템",applicant:"한국소방산업기술원",year:2023,expert:"소방기술사"},
+      {no:"KR10-2022-0078563",title:"디지털 트윈 기반 건축물 피난 시뮬레이션 장치",applicant:"한국건설기술연구원",year:2022,expert:"건축기계설비기술사"},
+      {no:"KR10-2021-0134521",title:"IoT 연동 스마트 방화구획 자동 차단 시스템",applicant:"한국전자통신연구원",year:2021,expert:"소방기술사"},
+      {no:"KR10-2020-0098765",title:"AI 기반 화재 확산 경로 예측 및 대피 유도 시스템",applicant:"국립소방연구원",year:2020,expert:"소방기술사"},
+      {no:"KR10-2023-0145678",title:"수소 연료전지 화재 특성 분석 및 진압 기술",applicant:"한국소방안전원",year:2023,expert:"소방기술사"},
+      {no:"KR10-2022-0056234",title:"터널 화재 시 제연·배연 최적 제어 시스템",applicant:"한국도로공사",year:2022,expert:"교통기술사"},
+      {no:"KR10-2021-0187654",title:"복합쇼핑몰 피난 시뮬레이션 기반 안전계획 수립 방법",applicant:"한국건설기술연구원",year:2021,expert:"건축기계설비기술사"},
+      {no:"KR10-2020-0076543",title:"스프링클러 감지 오작동 방지 AI 필터링 시스템",applicant:"한국소방산업기술원",year:2020,expert:"소방기술사"},
+      {no:"KR10-2019-0234567",title:"드론 기반 화재 현장 실시간 영상 전송 및 분석 시스템",applicant:"국립소방연구원",year:2019,expert:"방재기술사"},
+      {no:"KR10-2023-0089012",title:"전통시장 화재 취약구역 AI 위험도 평가 플랫폼",applicant:"소방청",year:2023,expert:"소방기술사"},
+    ],
+    papers:[
+      {title:"AI 영상분석을 이용한 건축물 화재 초기 감지 알고리즘",journal:"한국화재소방학회논문지",year:2024,authors:"최○○ 외 3인",expert:"소방기술사"},
+      {title:"물류창고 화재 특성 분석 및 소화시스템 개선방안",journal:"소방방재학회논문집",year:2023,authors:"정○○ 외 2인",expert:"건축기계설비기술사"},
+      {title:"고층건물 연기 확산 시뮬레이션 및 피난 안전성 평가",journal:"대한건축학회논문집",year:2023,authors:"한○○ 외 4인",expert:"소방기술사"},
+      {title:"터널 화재 시 연기 제어 최적화 수치 해석 연구",journal:"한국터널지하공간학회논문집",year:2022,authors:"배○○ 외 3인",expert:"교통기술사"},
+      {title:"복합건축물 화재 피난 경로 최적화 알고리즘",journal:"한국화재소방학회논문지",year:2022,authors:"장○○ 외 2인",expert:"소방기술사"},
+      {title:"방화구획 미설치 건축물 화재 확산 특성 실험 연구",journal:"대한건축학회논문집",year:2021,authors:"백○○ 외 4인",expert:"건축기계설비기술사"},
+      {title:"전기차 배터리 화재 특성 및 소화 방법 연구",journal:"소방방재학회논문집",year:2021,authors:"김○○ 외 3인",expert:"소방기술사"},
+    ],
+    laws:[
+      {name:"화재의 예방 및 안전관리에 관한 법률",article:"제9조 (소방안전관리 대상물)"},
+      {name:"건축물의 피난·방화구조 등의 기준에 관한 규칙",article:"제14조 (방화구획 설치기준)"},
+      {name:"소방시설 설치 및 관리에 관한 법률",article:"제12조 (소방시설의 설치·관리)"},
+      {name:"소방기본법",article:"제24조 (소방활동 방해 금지 및 강제처분)"},
+      {name:"건축법",article:"제49조 (건축물의 피난시설 설치 기준)"},
+      {name:"위험물안전관리법",article:"제14조 (위험물 취급소 안전관리)"},
+      {name:"초고층 및 지하연계 복합건축물 재난관리에 관한 특별법",article:"제9조 (피난안전구역 설치)"},
+      {name:"다중이용업소의 안전관리에 관한 특별법",article:"제9조 (안전시설 설치 기준)"},
+      {name:"산업안전보건법",article:"제38조 (안전조치 — 화재·폭발 방지)"},
+    ],
+  },
+  산사태: {
+    icon:"⛰️", color:"#f59e0b", grad:"linear-gradient(135deg,#d97706,#b45309)",
+    keywords:["산사태","사면","낙석","토석","균열","붕괴","급경사","사면"],
+    summary:"산사태는 집중강우, 취약 사면 방치, 조기경보 부재가 복합적으로 작용합니다.",
+    actions:["🚨 경사지·계곡 즉시 대피","📱 119·산림청 예보 확인","🚗 산악도로·계곡 진입 금지","👂 이상 소리 감지 시 즉시 대피","🏠 1층에서 고층으로 이동"],
+    measures:[
+      {action:"🔍 원인 파악: 강우강도·사면 붕괴·토석류 유형 구분",law:"급경사지 재해예방에 관한 법률 제5조",lawdesc:"급경사지 정밀안전점검 실시 의무"},
+      {action:"🚧 위험 구역 즉시 통제 및 주민 대피",law:"자연재해대책법 제18조",lawdesc:"재난예방을 위한 대피명령 권한"},
+      {action:"📡 사면 변위계·CCTV 실시간 모니터링",law:"산사태 예방 및 복구에 관한 법률 제8조",lawdesc:"산사태 위험지역 모니터링 체계 구축"},
+      {action:"🏗️ 긴급 배수로 설치 — 토석류 방향 유도",law:"급경사지 재해예방에 관한 법률 제10조",lawdesc:"급경사지 정비사업 시행"},
+      {action:"⚠️ 2차 붕괴 위험 구역 추가 설정",law:"자연재해대책법 제46조",lawdesc:"산사태 조기경보 및 위험지역 관리"},
+    ],
+    experts:[{c:"사면 붕괴·옹벽",e:"토목구조기술사"},{c:"토석류·경보",e:"방재기술사"},{c:"도로 사면·낙석",e:"교통기술사"},{c:"지반·연약지반",e:"토목시공기술사"}],
+    rnd:["위성·드론 융합 산사태 실시간 모니터링","AI 기반 토석류 발생 예측 조기경보 모델","급경사지 자동 변위 감지·경보 시스템"],
+    patents:[
+      {no:"KR10-2023-0065219",title:"드론·위성 융합 산사태 위험지역 실시간 모니터링 시스템",applicant:"국립산림과학원",year:2023,expert:"방재기술사"},
+      {no:"KR10-2022-0108743",title:"IoT 센서 기반 사면 변위 자동감지 및 조기경보 장치",applicant:"한국지질자원연구원",year:2022,expert:"토목구조기술사"},
+      {no:"KR10-2021-0076532",title:"머신러닝을 이용한 임계강우량 산정 및 산사태 예측 모델",applicant:"행정안전부",year:2021,expert:"방재기술사"},
+      {no:"KR10-2020-0143210",title:"AI 기반 급경사지 위험도 등급 자동 분류 시스템",applicant:"한국지질자원연구원",year:2020,expert:"토목구조기술사"},
+      {no:"KR10-2023-0098765",title:"광섬유 센서 기반 사면 지중변위 실시간 계측 장치",applicant:"한국건설기술연구원",year:2023,expert:"토목시공기술사"},
+      {no:"KR10-2022-0034567",title:"토석류 방지댐 설계 최적화 수치 해석 프로그램",applicant:"국립산림과학원",year:2022,expert:"토목구조기술사"},
+      {no:"KR10-2021-0187009",title:"강우레이더 기반 산사태 발생 30분 전 조기경보 시스템",applicant:"기상청",year:2021,expert:"방재기술사"},
+      {no:"KR10-2020-0056781",title:"도로 절토사면 붕괴 징후 AI 영상 감지 시스템",applicant:"한국도로공사",year:2020,expert:"교통기술사"},
+      {no:"KR10-2019-0234098",title:"사방댐 위치 선정 자동화 GIS 기반 의사결정 시스템",applicant:"산림청",year:2019,expert:"방재기술사"},
+      {no:"KR10-2023-0176543",title:"딥러닝 기반 항공사진 산사태 피해 면적 자동 추출",applicant:"국립재난안전연구원",year:2023,expert:"방재기술사"},
+    ],
+    papers:[
+      {title:"위성영상과 AI를 활용한 산사태 취약지역 자동 탐지 기법",journal:"한국방재학회논문집",year:2024,authors:"서○○ 외 3인",expert:"방재기술사"},
+      {title:"토석류 발생 임계강우 분석 및 조기경보 기준 설정",journal:"대한토목학회논문집",year:2023,authors:"조○○ 외 2인",expert:"토목구조기술사"},
+      {title:"급경사지 사면붕괴 메커니즘 및 방지공법 최적화",journal:"한국지반공학회논문집",year:2023,authors:"노○○ 외 4인",expert:"토목시공기술사"},
+      {title:"국내 산사태 취약지역 분포 특성과 기후변화 영향 분석",journal:"대한지질학회지",year:2022,authors:"배○○ 외 3인",expert:"방재기술사"},
+      {title:"도로 절토사면 붕괴 사례 분석 및 안전관리 개선방안",journal:"한국도로학회논문집",year:2022,authors:"장○○ 외 2인",expert:"교통기술사"},
+      {title:"사방댐 설치에 따른 토석류 저감 효과 수치 해석",journal:"한국방재학회논문집",year:2021,authors:"백○○ 외 4인",expert:"토목구조기술사"},
+      {title:"광섬유 분포형 센서를 이용한 사면 변위 모니터링 연구",journal:"한국지반공학회논문집",year:2021,authors:"김○○ 외 3인",expert:"토목시공기술사"},
+    ],
+    laws:[
+      {name:"급경사지 재해예방에 관한 법률",article:"제5조 (급경사지 정밀안전점검)"},
+      {name:"산사태 예방 및 복구에 관한 법률",article:"제8조 (산사태 위험지역 지정)"},
+      {name:"자연재해대책법",article:"제46조 (산사태 조기경보 시스템 구축)"},
+      {name:"산림법",article:"제45조 (사방사업 시행)"},
+      {name:"도로법",article:"제32조 (도로관리청의 유지·관리 의무)"},
+      {name:"재난 및 안전관리 기본법",article:"제25조 (재난관리책임기관의 사전 안전점검)"},
+      {name:"국토의 계획 및 이용에 관한 법률",article:"제37조 (방재지구 지정)"},
+      {name:"건설기술 진흥법",article:"제62조 (건설사고 조사 및 예방)"},
+      {name:"토지이용규제 기본법",article:"제8조 (지역·지구 등의 지정 및 행위제한)"},
+    ],
+  },
+  지진: {
+    icon:"⚡", color:"#f97316", grad:"linear-gradient(135deg,#ea580c,#c2410c)",
+    keywords:["지진","내진","흔들","액상화","진도","단층","여진","해일"],
+    summary:"지진 피해는 내진설계 미흡, 조기경보 오보, 시설물 안전점검 부재가 주요 원인입니다.",
+    actions:["🛡️ 탁자 밑·벽 기둥 옆 몸 보호","🚪 출구 확보","🔥 가스·전기 차단","🏃 흔들림 후 신속 대피","📱 기상청 조기경보 확인"],
+    measures:[
+      {action:"🔍 피해 유형 파악: 건물 붕괴·액상화·화재 연계 구분",law:"지진·화산재해대책법 제16조",lawdesc:"지진 피해 조사 및 보고 의무"},
+      {action:"🚧 위험 건물 접근 통제 및 2차 피해 방지",law:"재난 및 안전관리 기본법 제14조",lawdesc:"재난관리책임기관의 현장 통제 권한"},
+      {action:"🏗️ 1·2종 시설물 긴급 안전점검 실시",law:"시설물의 안전 및 유지관리에 관한 특별법 제11조",lawdesc:"정밀안전점검 의무 및 점검 기준"},
+      {action:"📡 여진 대비 계속 모니터링",law:"지진·화산재해대책법 제14조",lawdesc:"내진설계 의무 및 여진 대응 체계"},
+      {action:"🏥 부상자 분류·이송 체계 가동",law:"재난 및 안전관리 기본법 제38조",lawdesc:"응급의료 지원 및 긴급구조 체계"},
+    ],
+    experts:[{c:"건물 내진·구조",e:"토목구조기술사"},{c:"건축 내진 성능",e:"건축구조기술사"},{c:"액상화·지반",e:"토목시공기술사"},{c:"복합재난 대응",e:"방재기술사"}],
+    rnd:["AI 기반 지진 조기경보 정밀도 향상 기술","주요 시설물 내진 성능 평가 자동화 플랫폼","동해 지진해일 시나리오 DB 구축"],
+    patents:[
+      {no:"KR10-2023-0094317",title:"AI 딥러닝 기반 지진파 분류 및 조기경보 고도화 시스템",applicant:"기상청",year:2023,expert:"방재기술사"},
+      {no:"KR10-2022-0123456",title:"분산 IoT 센서망을 이용한 시설물 내진 성능 실시간 모니터링",applicant:"한국시설안전공단",year:2022,expert:"토목구조기술사"},
+      {no:"KR10-2021-0087654",title:"지반 액상화 위험도 평가 및 자동 알림 시스템",applicant:"한국지질자원연구원",year:2021,expert:"토목시공기술사"},
+      {no:"KR10-2020-0176543",title:"건축물 내진성능 자동 평가 AI 플랫폼",applicant:"한국건설기술연구원",year:2020,expert:"건축구조기술사"},
+      {no:"KR10-2023-0134098",title:"지진 조기경보 수신 후 가스·엘리베이터 자동 차단 시스템",applicant:"한국가스안전공사",year:2023,expert:"방재기술사"},
+      {no:"KR10-2022-0067890",title:"딥러닝 기반 지진 여진 시계열 예측 모델",applicant:"기상청",year:2022,expert:"방재기술사"},
+      {no:"KR10-2021-0209876",title:"광섬유 센서를 이용한 교량 내진 거동 실시간 계측 장치",applicant:"한국시설안전공단",year:2021,expert:"토목구조기술사"},
+      {no:"KR10-2020-0098123",title:"해저 단층 탐사 기반 지진해일 발생 가능성 예측 시스템",applicant:"한국해양과학기술원",year:2020,expert:"방재기술사"},
+      {no:"KR10-2019-0145671",title:"RC 건물 내진보강을 위한 최적 공법 선정 의사결정 시스템",applicant:"국토연구원",year:2019,expert:"건축구조기술사"},
+      {no:"KR10-2023-0056723",title:"지진 후 건축물 긴급 안전 점검 자동화 드론 시스템",applicant:"국립재난안전연구원",year:2023,expert:"건축구조기술사"},
+    ],
+    papers:[
+      {title:"딥러닝 기반 지진 P파 초동 검출 정확도 향상 연구",journal:"지구물리및물리탐사",year:2024,authors:"장○○ 외 3인",expert:"방재기술사"},
+      {title:"경주·포항 지진 사례 분석을 통한 내진설계 기준 개선방안",journal:"대한토목학회논문집",year:2023,authors:"백○○ 외 2인",expert:"토목구조기술사"},
+      {title:"주요 시설물 내진성능 자동평가 플랫폼 개발",journal:"한국지진공학회논문집",year:2023,authors:"김○○ 외 4인",expert:"건축구조기술사"},
+      {title:"포항 지진 지반 액상화 피해 분석 및 복구 방안",journal:"한국지반공학회논문집",year:2022,authors:"이○○ 외 3인",expert:"토목시공기술사"},
+      {title:"RC 건물 내진보강 공법별 비용-효과 분석",journal:"대한건축학회논문집",year:2022,authors:"최○○ 외 2인",expert:"건축구조기술사"},
+      {title:"동해 지진해일 내습 시나리오 및 피해 예측 연구",journal:"한국해안해양공학회지",year:2021,authors:"정○○ 외 4인",expert:"방재기술사"},
+      {title:"지진 조기경보 시스템 오보 저감 알고리즘 개발",journal:"지진공학회논문집",year:2021,authors:"한○○ 외 3인",expert:"방재기술사"},
+    ],
+    laws:[
+      {name:"지진·화산재해대책법",article:"제14조 (내진설계 의무 대상)"},
+      {name:"시설물의 안전 및 유지관리에 관한 특별법",article:"제11조 (정밀안전점검)"},
+      {name:"건축물 내진설계 기준 KDS 41 17 00",article:"내진성능 목표 및 설계지진력"},
+      {name:"건축법",article:"제48조 (구조 내력 — 내진 성능 확보)"},
+      {name:"재난 및 안전관리 기본법",article:"제38조 (위기경보 발령)"},
+      {name:"학교시설사업 촉진법",article:"제8조 (내진 성능 확보 의무)"},
+      {name:"소방시설 설치 및 관리에 관한 법률",article:"제12조 (지진 시 소방시설 작동 기준)"},
+      {name:"도시가스사업법",article:"제17조 (가스 공급 시설 안전 기준)"},
+      {name:"원자력안전법",article:"제20조 (원자력시설 지진 내구성 기준)"},
+    ],
+  },
+};
+
+// ─── 기상재난 온톨로지 KB ──────────────────────────────────────────
+const WEATHER_KB = {
+  폭염: {
+    icon:"🌡️", color:"#ef4444", grad:"linear-gradient(135deg,#dc2626,#b91c1c)",
+    keywords:["폭염","열사병","무더위","기온","열돔","체감온도","더위"],
+    actions:["🚰 수분 충분히 섭취 (30분마다)","🏠 낮 12~17시 야외활동 자제","👕 밝은색 얇은 옷 착용","🆘 열사병 증상 시 즉시 119","❄️ 무더위 쉼터 이용"],
+    measures:[
+      {action:"🌡️ 폭염 특보 단계 확인 (주의보 33℃/경보 35℃)",law:"기상법 제16조",lawdesc:"기상특보 발령 기준 및 대응 의무"},
+      {action:"👴 독거노인·영유아 등 취약계층 안전 확인",law:"자연재해대책법 제23조",lawdesc:"폭염 피해 예방대책 수립 의무"},
+      {action:"🏗️ 야외 작업장 오후 2~5시 작업 중단",law:"산업안전보건법 제5조",lawdesc:"사업주의 온열질환 예방 조치 의무"},
+      {action:"📊 온열질환자 현황 실시간 집계·보고",law:"재난 및 안전관리 기본법 제20조",lawdesc:"재난 피해 현황 보고 의무"},
+      {action:"🌊 냉방시설 미비 지역 긴급 쿨링센터 설치",law:"재난 및 안전관리 기본법 제3조",lawdesc:"폭염 자연재난 대응 체계"},
+    ],
+    patents:[
+      {no:"KR10-2023-0102341",title:"AI 기반 도시 열섬 실시간 모니터링 및 폭염 조기경보 시스템",applicant:"기상청",year:2023},
+      {no:"KR10-2022-0087123",title:"딥러닝을 이용한 폭염 취약계층 위험도 예측 모델",applicant:"한국전자통신연구원",year:2022},
+      {no:"KR10-2021-0134782",title:"스마트 도시 냉각 시스템과 연계한 폭염 대응 플랫폼",applicant:"국토연구원",year:2021},
+    ],
+    papers:[
+      {title:"기후변화에 따른 한반도 폭염 발생 빈도 및 강도 변화 분석",journal:"대한기상학회지",year:2024,authors:"김○○ 외 3인"},
+      {title:"도시 열섬 효과가 폭염 취약성에 미치는 영향 평가",journal:"한국기후변화학회지",year:2023,authors:"이○○ 외 2인"},
+      {title:"인공지능 기반 폭염 조기경보 시스템 정확도 향상 연구",journal:"대기",year:2023,authors:"박○○ 외 4인"},
+    ],
+    laws:[
+      {name:"재난 및 안전관리 기본법",article:"제3조 (재난 정의 — 폭염 포함)"},
+      {name:"자연재해대책법",article:"제23조 (폭염 피해 예방대책 수립)"},
+      {name:"기상법",article:"제16조 (폭염경보 — 최고기온 38℃ 이상 2일)"},
+    ],
+  },
+  한파: {
+    icon:"🌨️", color:"#3b82f6", grad:"linear-gradient(135deg,#2563eb,#1d4ed8)",
+    keywords:["한파","동파","결빙","블랙아이스","눈","폭설","저온","동상"],
+    actions:["🧤 방한복·장갑·마스크 착용","🚗 결빙 도로 서행 (감속 50%)","🏠 수도계량기 보온재 감싸기","🔥 가스난방 환기 주의","📞 독거노인·취약계층 안부 확인"],
+    measures:[
+      {action:"❄️ 한파 특보 단계 확인 (주의보 -12℃/경보 -15℃)",law:"기상법 제16조",lawdesc:"기상특보 발령 기준 및 대응 의무"},
+      {action:"🚧 결빙 도로 제설·제빙 즉시 시행",law:"도로법 제32조",lawdesc:"도로관리청의 도로 유지·관리 의무"},
+      {action:"🏗️ 공사장 동파 방지 및 안전 조치",law:"산업안전보건법 제5조",lawdesc:"사업주의 한랭 작업 안전조치 의무"},
+      {action:"📊 취약계층 한파 피해 실시간 모니터링",law:"재난 및 안전관리 기본법 제3조",lawdesc:"한파 자연재난 대응 체계"},
+      {action:"💧 상수도관 동파 신고센터 운영·긴급 복구",law:"수도법 제17조",lawdesc:"수도사업자의 급수 유지 의무"},
+    ],
+    patents:[
+      {no:"KR10-2023-0078234",title:"머신러닝 기반 도로 결빙 예측 및 블랙아이스 조기경보 시스템",applicant:"한국건설기술연구원",year:2023},
+      {no:"KR10-2022-0056789",title:"IoT 센서를 이용한 상수도관 동파 위험 예측 및 원격 차단 장치",applicant:"한국수자원공사",year:2022},
+      {no:"KR10-2021-0098123",title:"AI 기반 적설량 예측 모델과 연계한 교통 통제 시스템",applicant:"도로교통공단",year:2021},
+    ],
+    papers:[
+      {title:"한반도 한파 발생 특성 변화와 북극 진동의 상관관계 분석",journal:"대한기상학회지",year:2024,authors:"최○○ 외 3인"},
+      {title:"딥러닝 기반 도로 블랙아이스 발생 예측 정확도 향상 연구",journal:"한국도로학회논문집",year:2023,authors:"정○○ 외 2인"},
+      {title:"도시 가스관·수도관 동파 피해 예측 모델 개발",journal:"한국방재학회논문집",year:2023,authors:"한○○ 외 4인"},
+    ],
+    laws:[
+      {name:"재난 및 안전관리 기본법",article:"제3조 (한파 자연재난 포함)"},
+      {name:"기상법",article:"제16조 (한파 경보 기준 — -15℃ 이하 2일)"},
+      {name:"도로교통법",article:"제31조 (결빙 도로 서행·안전거리 확보 의무)"},
+    ],
+  },
+  태풍: {
+    icon:"🌀", color:"#8b5cf6", grad:"linear-gradient(135deg,#7c3aed,#6d28d9)",
+    keywords:["태풍","강풍","폭우","해일","너울","상륙","바람","태풍경보"],
+    actions:["🏠 실내 대피·창문 테이프 보강","📱 기상청 태풍 특보 지속 확인","🚗 불필요한 외출·운행 자제","⚓ 선박 항구 대피·결박","🌊 해안·하천변 즉시 대피"],
+    measures:[
+      {action:"🌀 태풍 위치·강도·예상 경로 실시간 파악",law:"기상법 제13조",lawdesc:"기상청의 기상예보 및 특보 발령 의무"},
+      {action:"🚧 침수 취약 지역 사전 통제·주민 대피",law:"자연재해대책법 제18조",lawdesc:"태풍·호우 시 대피명령 권한"},
+      {action:"🏗️ 비탈면·가설물 긴급 안전 점검",law:"재난 및 안전관리 기본법 제25조",lawdesc:"재난관리책임기관의 사전 안전점검 의무"},
+      {action:"📊 피해 현황 시군구별 실시간 수집",law:"재난 및 안전관리 기본법 제20조",lawdesc:"재난 상황 보고 및 공개 의무"},
+      {action:"🚁 고립지역 응급 대응체계 가동",law:"재난 및 안전관리 기본법 제38조",lawdesc:"긴급구조 및 응급의료 지원 체계"},
+    ],
+    patents:[
+      {no:"KR10-2023-0134521",title:"AI 기반 태풍 경로 예측 정밀도 향상 및 실시간 피해 예측 시스템",applicant:"기상청",year:2023},
+      {no:"KR10-2022-0112345",title:"드론 군집을 이용한 태풍 현장 실시간 모니터링 시스템",applicant:"국가기상위성센터",year:2022},
+      {no:"KR10-2021-0087654",title:"딥러닝 기반 해안 너울 예측 및 해수욕장 안전경보 시스템",applicant:"한국해양과학기술원",year:2021},
+    ],
+    papers:[
+      {title:"한반도 태풍 강도 변화 추세와 기후변화의 연관성 분석",journal:"대한기상학회지",year:2024,authors:"서○○ 외 3인"},
+      {title:"인공지능을 활용한 태풍 진로 예측 불확실성 정량화",journal:"한국기상학회논문집",year:2023,authors:"조○○ 외 2인"},
+      {title:"태풍 내습 시 연안 해일 피해 예측 모델 개발",journal:"한국해안해양공학회지",year:2023,authors:"노○○ 외 4인"},
+    ],
+    laws:[
+      {name:"재난 및 안전관리 기본법",article:"제38조 (태풍 위기경보 발령)"},
+      {name:"자연재해대책법",article:"제18조 (태풍·호우 대피명령)"},
+      {name:"기상법",article:"제16조 (태풍 특보 — 최대풍속 17m/s 이상)"},
+    ],
+  },
+  황사: {
+    icon:"🌫️", color:"#f59e0b", grad:"linear-gradient(135deg,#d97706,#b45309)",
+    keywords:["황사","미세먼지","초미세먼지","PM2.5","PM10","모래폭풍","대기질"],
+    actions:["😷 KF80 이상 마스크 착용 필수","🏠 외출 자제·창문 닫기","🥗 면역력 강화 식품 섭취","👁️ 콘택트렌즈 착용 자제","🚿 귀가 후 즉시 세면·양치"],
+    measures:[
+      {action:"📊 에어코리아 대기질 등급 실시간 모니터링",law:"대기환경보전법 제8조",lawdesc:"대기오염 경보 발령 기준 및 대응"},
+      {action:"🏫 민감계층 시설 실내활동 전환",law:"학교보건법 제8조",lawdesc:"학교의 대기오염 대응 조치 의무"},
+      {action:"🌱 대기질 나쁨 시 옥외 행사 취소",law:"재난 및 안전관리 기본법 제3조",lawdesc:"황사 자연재난 대응 체계"},
+      {action:"💊 호흡기·심혈관 환자 약 처방 수요 대비",law:"약사법 제44조",lawdesc:"의약품 수급 안정 및 공급 관리"},
+      {action:"🏗️ 건설 현장 옥외 작업 중단 검토",law:"산업안전보건법 제5조",lawdesc:"사업주의 근로자 건강 보호 의무"},
+    ],
+    patents:[
+      {no:"KR10-2023-0091234",title:"위성영상과 AI를 이용한 황사 발원지 탐지 및 국내 영향 예측 시스템",applicant:"국립환경과학원",year:2023},
+      {no:"KR10-2022-0078901",title:"딥러닝 기반 미세먼지 농도 24시간 예측 모델",applicant:"한국과학기술연구원",year:2022},
+      {no:"KR10-2021-0112233",title:"IoT 센서 네트워크 기반 실내외 미세먼지 실시간 모니터링",applicant:"환경부",year:2021},
+    ],
+    papers:[
+      {title:"몽골·중국 발원 황사의 한반도 영향 빈도 변화 분석",journal:"대한기상학회지",year:2024,authors:"배○○ 외 3인"},
+      {title:"초미세먼지 PM2.5 단기 예측을 위한 앙상블 딥러닝 모델",journal:"한국대기환경학회지",year:2023,authors:"장○○ 외 2인"},
+      {title:"황사·미세먼지 복합 대기오염이 심폐질환에 미치는 영향",journal:"환경보건학회지",year:2023,authors:"백○○ 외 4인"},
+    ],
+    laws:[
+      {name:"재난 및 안전관리 기본법",article:"제3조 (황사 자연재난 포함)"},
+      {name:"대기환경보전법",article:"제8조 (대기오염 경보 발령 기준)"},
+      {name:"기상법",article:"제16조 (황사 특보 — 황사농도 800㎍/㎥ 이상)"},
+    ],
+  },
+  집중호우: {
+    icon:"⛈️", color:"#06b6d4", grad:"linear-gradient(135deg,#0891b2,#0e7490)",
+    keywords:["집중호우","폭우","강수","호우","장마","강우","소나기"],
+    actions:["🚨 저지대·지하공간 즉시 대피","🚗 침수 도로·지하차도 진입 절대 금지","📱 안전디딤돌 앱 재난문자 확인","⚡ 전기·가스 메인 차단","📢 이웃·노약자 대피 안내"],
+    measures:[
+      {action:"🌧️ 호우 특보 단계 확인 (주의보: 3시간 60mm/경보: 110mm)",law:"기상법 제16조",lawdesc:"호우 특보 기준 및 대응 의무"},
+      {action:"🚧 침수 위험 도로·교량 통제",law:"도로법 제32조",lawdesc:"도로관리청의 통행 제한 권한"},
+      {action:"💧 배수펌프장 가동 준비 및 즉시 가동",law:"자연재해대책법 제22조",lawdesc:"풍수해위험지구 정비·관리 의무"},
+      {action:"📊 하천 수위 실시간 모니터링",law:"하천법 제74조",lawdesc:"홍수관리구역 수위 관측 의무"},
+      {action:"🏗️ 취약 제방 긴급 점검 및 보강",law:"하천법 제27조",lawdesc:"제방·호안 등 하천 시설 관리 의무"},
+    ],
+    patents:[
+      {no:"KR10-2023-0076543",title:"AI 기반 도시 집중호우 침수 예측 및 대피 경로 안내 시스템",applicant:"한국건설기술연구원",year:2023},
+      {no:"KR10-2022-0098765",title:"기상레이더와 딥러닝을 결합한 초단기 강수량 예측 모델",applicant:"기상청",year:2022},
+      {no:"KR10-2021-0123456",title:"도시 하수관거 실시간 수위 모니터링 및 역류 예측 시스템",applicant:"환경부",year:2021},
+    ],
+    papers:[
+      {title:"기후변화에 따른 도시 집중호우 빈도·강도 변화와 방재 대책",journal:"한국방재학회논문집",year:2024,authors:"김○○ 외 3인"},
+      {title:"딥러닝 기반 기상레이더 초단기 강수 예측 정확도 향상",journal:"대한기상학회지",year:2023,authors:"이○○ 외 2인"},
+      {title:"도시 집중호우 침수 취약지역 선정 기준 및 예측 모델",journal:"한국수자원학회논문집",year:2023,authors:"박○○ 외 4인"},
+    ],
+    laws:[
+      {name:"자연재해대책법",article:"제22조 (호우 위험지구 정비)"},
+      {name:"기상법",article:"제16조 (호우 특보 — 3시간 60mm 또는 12시간 110mm)"},
+      {name:"하천법",article:"제74조 (홍수 관리구역 지정)"},
+    ],
+  },
+};
+
+// 합친 전체 KB
+const ALL_KB = {...DISASTER_KB, ...WEATHER_KB};
+const DISASTER_CATS = Object.keys(DISASTER_KB);
+const WEATHER_CATS  = Object.keys(WEATHER_KB);
+
+function detectType(txt){
+  const l=txt.toLowerCase();
+  for(const [type,info] of Object.entries(ALL_KB)){
+    if(info.keywords&&info.keywords.some(k=>l.includes(k))) return type;
+  }
+  return null;
+}
+
+function buildPrompt(type){
+  if(!type) return "당신은 재난·기상 AI 전문가입니다. 상황을 분석하고 대응 방안을 한국어로 안내합니다.";
+  const kb=ALL_KB[type];
+  const pList=kb.patents.map(p=>"[특허 "+p.no+"] "+p.title+" ("+p.applicant+", "+p.year+")").join("\n");
+  const paList=kb.papers.map(p=>"[논문] "+p.title+" — "+p.journal+" ("+p.authors+", "+p.year+")").join("\n");
+  const lList=kb.laws.map(l=>"[법령] "+l.name+" "+l.article).join("\n");
+  return "당신은 재난·기상 AI 전문가입니다. 아래 지식DB(특허·논문·법령)를 반드시 참조하여 분석하고 출처를 명시하세요.\n\n=== 관련 특허 ===\n"+pList+"\n\n=== 관련 논문 ===\n"+paList+"\n\n=== 관련 법령 ===\n"+lList+"\n\n규칙: ① 특허/논문/법령 출처 명시 ② 위험도 판정 ③ 즉각 행동 요령 ④ 전문가 연결 필요 여부를 한국어로 간결하게 답변.";
+}
+
+// ─── 공통 컴포넌트 ─────────────────────────────────────────────────
+function KnowledgeAccordion({type,onAskExpert}){
+  const [open,setOpen]=useState(null);
+  if(!type||!ALL_KB[type]) return null;
+  const kb=ALL_KB[type];
+  const secs=[
+    {key:"patents",icon:"📄",label:"관련 특허",sub:"KIPRIS · AI 답변 근거",color:"#06b6d4"},
+    {key:"papers", icon:"📚",label:"관련 논문",sub:"RISS · NDSL · AI 답변 근거",color:"#10b981"},
+    {key:"laws",   icon:"⚖️",label:"관련 법령",sub:"국가법령정보센터 · AI 답변 근거",color:"#f59e0b"},
+  ];
+  return(
+    <div style={{padding:"0 16px 16px"}}>
+      <div style={{fontSize:11,color:"#475569",fontWeight:600,marginBottom:8,letterSpacing:.5}}>📂 AI 분석 근거 지식 DB</div>
+      {secs.map(sec=>(
+        <div key={sec.key} style={{background:"#1e293b",borderRadius:12,border:"1px solid "+(open===sec.key?sec.color+"55":"#1e2d45"),overflow:"hidden",marginBottom:6}}>
+          <button onClick={()=>setOpen(open===sec.key?null:sec.key)}
+            style={{width:"100%",padding:"11px 13px",background:"transparent",border:"none",cursor:"pointer",display:"flex",alignItems:"center",gap:9,textAlign:"left"}}>
+            <div style={{width:30,height:30,borderRadius:8,background:sec.color+"22",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>{sec.icon}</div>
+            <div style={{flex:1}}>
+              <div style={{fontSize:12,fontWeight:700,color:"#f1f5f9"}}>{sec.label} · {kb[sec.key].length}건</div>
+              <div style={{fontSize:10,color:"#64748b",marginTop:1}}>{sec.sub}</div>
+            </div>
+            <span style={{fontSize:11,color:open===sec.key?sec.color:"#475569"}}>{open===sec.key?"▲":"▼"}</span>
+          </button>
+          {open===sec.key&&(
+            <div style={{padding:"0 13px 10px",display:"flex",flexDirection:"column",gap:8}}>
+              {kb[sec.key].map((item,i)=>(
+                <div key={i} style={{background:"#0f172a",borderRadius:9,padding:"10px 11px",border:"1px solid "+sec.color+"22"}}>
+                  {sec.key==="patents"&&(
+                    <div>
+                      <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+                        <span style={{fontSize:10,color:sec.color,fontWeight:700,background:sec.color+"18",borderRadius:4,padding:"1px 6px"}}>{item.no}</span>
+                        <span style={{fontSize:10,color:"#475569"}}>{item.year}</span>
+                      </div>
+                      <div style={{fontSize:11,fontWeight:600,color:"#e2e8f0",lineHeight:1.5,marginBottom:4}}>{item.title}</div>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <div style={{fontSize:10,color:"#64748b"}}>{item.applicant}</div>
+                        {item.expert&&onAskExpert&&(
+                          <button onClick={()=>onAskExpert(item.expert,item.title,"특허")}
+                            style={{background:"linear-gradient(135deg,#0891b2,#0284c7)",border:"none",borderRadius:20,padding:"4px 10px",color:"#fff",fontSize:10,fontWeight:700,cursor:"pointer",flexShrink:0,marginLeft:8,display:"flex",alignItems:"center",gap:4}}>
+                            👷 {item.expert}에게 묻기
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {sec.key==="papers"&&(
+                    <div>
+                      <div style={{fontSize:11,fontWeight:600,color:"#e2e8f0",lineHeight:1.5,marginBottom:4}}>{item.title}</div>
+                      <div style={{fontSize:10,color:sec.color,fontWeight:600}}>{item.journal}</div>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginTop:4}}>
+                        <div style={{fontSize:10,color:"#475569"}}>{item.authors} · {item.year}</div>
+                        {item.expert&&onAskExpert&&(
+                          <button onClick={()=>onAskExpert(item.expert,item.title,"논문")}
+                            style={{background:"linear-gradient(135deg,#059669,#047857)",border:"none",borderRadius:20,padding:"4px 10px",color:"#fff",fontSize:10,fontWeight:700,cursor:"pointer",flexShrink:0,marginLeft:8,display:"flex",alignItems:"center",gap:4}}>
+                            👷 {item.expert}에게 묻기
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                  {sec.key==="laws"&&(
+                    <div>
+                      <div style={{fontSize:11,fontWeight:700,color:sec.color,marginBottom:3}}>{item.name}</div>
+                      <div style={{fontSize:10,color:"#94a3b8",lineHeight:1.5}}>{item.article}</div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ─── 챗봇 공통 ─────────────────────────────────────────────────────
+function ChatBot({cats,label,onGoDetail}){
+  const [q,setQ]=useState("");
+  const [img,setImg]=useState(null);
+  const [listening,setListening]=useState(false);
+  const [showInput,setShowInput]=useState(false);
+  const [msgs,setMsgs]=useState([{role:"bot",text:"안녕하세요! 재난톡 AI입니다 🚨\n\n"+label+" 상황을 텍스트·사진·음성으로 알려주시면\n특허·논문·법령 DB를 참조하여 분석합니다."}]);
+  const [loading,setLoading]=useState(false);
+  const endRef=useRef(null);
+  const fileRef=useRef(null);
+  useEffect(()=>{endRef.current&&endRef.current.scrollIntoView({behavior:"smooth"});},[msgs,loading]);
+
+  const pickImg=(e)=>{
+    const f=e.target.files[0]; if(!f)return;
+    const rd=new FileReader();
+    rd.onload=(ev)=>setImg({url:ev.target.result,base64:ev.target.result.split(",")[1],type:f.type,name:f.name});
+    rd.readAsDataURL(f); e.target.value="";
+  };
+  const startVoice=()=>{
+    const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+    if(!SR){alert("음성 인식이 지원되지 않습니다."); return;}
+    const r=new SR(); r.lang="ko-KR";
+    r.onstart=()=>setListening(true);
+    r.onresult=(e)=>{setQ(e.results[0][0].transcript);setListening(false);};
+    r.onerror=()=>setListening(false); r.onend=()=>setListening(false); r.start();
+  };
+
+  const callAPI=(text,image,type)=>{
+    const sysPrompt=buildPrompt(type);
+    const content=[];
+    if(image)content.push({type:"image",source:{type:"base64",media_type:image.type,data:image.base64}});
+    content.push({type:"text",text:text||"이 현장 사진을 분석해주세요."});
+    return fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:600,system:sysPrompt,messages:[{role:"user",content}]})
+    }).then(r=>r.json()).then(d=>d.content&&d.content[0]&&d.content[0].text||"");
+  };
+
+  const doSend=()=>{
+    if(!q.trim()&&!img)return;
+    const text=q.trim(),image=img;
+    setMsgs(m=>[...m,{role:"user",text:text||"📸 현장 사진",imgUrl:image&&image.url}]);
+    setQ(""); setImg(null); setShowInput(false); setLoading(true);
+    const detected=detectType(text)||cats[0];
+    callAPI(text,image,detected)
+      .then(aiText=>{
+        const finalType=detectType(aiText)||detected;
+        const kb=ALL_KB[finalType];
+        setMsgs(m=>[...m,{role:"bot",text:aiText,wtype:finalType,action:()=>onGoDetail(finalType,text||"현장 분석")}]);
+      })
+      .catch(()=>{
+        const kb=ALL_KB[detected];
+        setMsgs(m=>[...m,{role:"bot",
+          text:kb.icon+" "+detected+" 상황입니다.\n\n[논문] "+kb.papers[0].title+"에 따르면 즉각 대응이 필요합니다.\n[법령] "+kb.laws[0].name+" "+kb.laws[0].article+"에 의거하여 대응하세요.",
+          wtype:detected,action:()=>onGoDetail(detected,text||"현장 분석")}]);
+      })
+      .finally(()=>setLoading(false));
+  };
+
+  return(
+    <div style={{display:"flex",flexDirection:"column",height:"calc(100vh - 156px)"}}>
+      <style>{"@keyframes bounce{0%,80%,100%{transform:scale(0)}40%{transform:scale(1.2)}}"}</style>
+      {/* 유형 버튼 */}
+      <div style={{padding:"10px 16px",borderBottom:"1px solid #1a2744",background:"#0d1526",flexShrink:0}}>
+        <div style={{display:"flex",gap:6}}>
+          {cats.map(cat=>{const kb=ALL_KB[cat]; return(
+            <button key={cat} onClick={()=>onGoDetail(cat,"")}
+              style={{flex:1,padding:"8px 2px",background:"#1e293b",border:"1.5px solid "+kb.color+"44",borderRadius:10,cursor:"pointer",textAlign:"center"}}>
+              <div style={{fontSize:18,marginBottom:2}}>{kb.icon}</div>
+              <div style={{fontSize:10,fontWeight:700,color:kb.color}}>{cat}</div>
+            </button>
+          );})}
+        </div>
+      </div>
+
+      {/* 대화창 */}
+      <div style={{flex:1,overflowY:"auto",padding:"14px 16px",display:"flex",flexDirection:"column",gap:10}}>
+        {msgs.map((m,i)=>(
+          <div key={i} style={{display:"flex",justifyContent:m.role==="user"?"flex-end":"flex-start",gap:8}}>
+            {m.role==="bot"&&(
+              <div style={{width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#0891b2,#0e7490)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0,marginTop:2}}>🤖</div>
+            )}
+            <div style={{maxWidth:"80%",display:"flex",flexDirection:"column",gap:5}}>
+              {m.imgUrl&&<img src={m.imgUrl} alt="" style={{width:"100%",maxHeight:130,objectFit:"cover",borderRadius:14,border:"2px solid #1e3a5f"}}/>}
+              <div style={{padding:"11px 14px",
+                borderRadius:m.role==="user"?"18px 18px 4px 18px":"18px 18px 18px 4px",
+                background:m.role==="user"?"linear-gradient(135deg,#0891b2,#0284c7)":"#1e293b",
+                color:"#f1f5f9",fontSize:12,lineHeight:1.8,
+                boxShadow:m.role==="user"?"0 4px 16px #0891b233":"0 2px 8px #00000020",
+                whiteSpace:"pre-wrap"}}>
+                {m.text}
+              </div>
+              {m.action&&m.wtype&&ALL_KB[m.wtype]&&(
+                <button onClick={m.action}
+                  style={{padding:"9px 14px",background:ALL_KB[m.wtype].grad,border:"none",borderRadius:10,color:"#fff",fontSize:12,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",gap:6}}>
+                  <span>{ALL_KB[m.wtype].icon}</span>
+                  <span>4단계 대응 안내 →</span>
+                </button>
+              )}
+            </div>
+          </div>
+        ))}
+        {/* 첫화면 예시 */}
+        {msgs.length===1&&!loading&&(
+          <div style={{marginTop:4,display:"flex",flexDirection:"column",gap:7}}>
+            <div style={{fontSize:11,color:"#475569",fontWeight:600,marginBottom:2}}>💬 예시 (클릭하면 온톨로지 분석)</div>
+            {cats.map((cat,i)=>{const kb=ALL_KB[cat]; return(
+              <button key={i} onClick={()=>{
+                const ex="현장에서 "+cat+" 상황이 발생했습니다. 대응 방법을 알려주세요.";
+                setMsgs(m=>[...m,{role:"user",text:ex}]);
+                setLoading(true);
+                callAPI(ex,null,cat)
+                  .then(aiText=>setMsgs(m=>[...m,{role:"bot",text:aiText,wtype:cat,action:()=>onGoDetail(cat,ex)}]))
+                  .catch(()=>setMsgs(m=>[...m,{role:"bot",text:kb.icon+" "+cat+" 상황입니다.\n[논문] "+kb.papers[0].title+" 등을 참조하여 대응하세요.",wtype:cat,action:()=>onGoDetail(cat,ex)}]))
+                  .finally(()=>setLoading(false));
+              }}
+                style={{background:"#1e293b",border:"1px solid "+kb.color+"33",borderRadius:11,padding:"10px 13px",cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:9}}>
+                <span style={{fontSize:18,flexShrink:0}}>{kb.icon}</span>
+                <div>
+                  <div style={{fontSize:11,color:kb.color,fontWeight:700,marginBottom:1}}>{cat}</div>
+                  <div style={{fontSize:11,color:"#94a3b8"}}>{"현장에서 "+cat+" 상황이 발생했습니다."}</div>
+                </div>
+              </button>
+            );})}
+          </div>
+        )}
+        {loading&&(
+          <div style={{display:"flex",gap:8}}>
+            <div style={{width:30,height:30,borderRadius:"50%",background:"linear-gradient(135deg,#0891b2,#0e7490)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13}}>🤖</div>
+            <div style={{padding:"11px 16px",background:"#1e293b",borderRadius:"18px 18px 18px 4px",display:"flex",flexDirection:"column",gap:3}}>
+              <div style={{fontSize:10,color:"#64748b"}}>특허·논문·법령 DB 참조 분석 중...</div>
+              <div style={{display:"flex",gap:4}}>{[0,1,2].map(i=><div key={i} style={{width:6,height:6,borderRadius:"50%",background:"#06b6d4",animation:"bounce 1.2s "+i*0.2+"s infinite"}}/>)}</div>
+            </div>
+          </div>
+        )}
+        <div ref={endRef}/>
+      </div>
+
+      {img&&(
+        <div style={{margin:"0 16px 5px",padding:"7px 11px",background:"#1e3a5f",borderRadius:9,display:"flex",alignItems:"center",gap:7,border:"1px solid #06b6d444",flexShrink:0}}>
+          <img src={img.url} alt="" style={{width:32,height:32,objectFit:"cover",borderRadius:5}}/>
+          <div style={{flex:1}}><div style={{fontSize:11,fontWeight:700,color:"#06b6d4"}}>📎 사진 첨부됨</div><div style={{fontSize:10,color:"#64748b"}}>{img.name}</div></div>
+          <button onClick={()=>setImg(null)} style={{background:"transparent",border:"none",color:"#64748b",cursor:"pointer",fontSize:16}}>×</button>
+        </div>
+      )}
+      {showInput&&(
+        <div style={{padding:"6px 16px 0",display:"flex",gap:6,flexShrink:0}}>
+          <input ref={fileRef} type="file" accept="image/*" onChange={pickImg} style={{display:"none"}}/>
+          <button onClick={()=>fileRef.current.click()}
+            style={{flex:1,padding:"9px",background:img?"#1e3a5f":"#1e293b",border:"1.5px solid "+(img?"#06b6d4":"#334155"),borderRadius:9,cursor:"pointer",color:img?"#06b6d4":"#94a3b8",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+            📸 사진
+          </button>
+          <button onClick={startVoice}
+            style={{flex:1,padding:"9px",background:listening?"#3f0d1a":"#1e293b",border:"1.5px solid "+(listening?"#f43f5e":"#334155"),borderRadius:9,cursor:"pointer",color:listening?"#f43f5e":"#94a3b8",fontSize:11,fontWeight:600,display:"flex",alignItems:"center",justifyContent:"center",gap:4}}>
+            {listening?"🔴 듣는 중":"🎤 음성"}
+          </button>
+        </div>
+      )}
+      <div style={{padding:"7px 16px 12px",display:"flex",gap:6,alignItems:"center",borderTop:"1px solid #1a2744",flexShrink:0}}>
+        <button onClick={()=>setShowInput(v=>!v)}
+          style={{width:38,height:38,background:showInput?"#0891b222":"#1e293b",border:"1.5px solid "+(showInput?"#0891b2":"#334155"),borderRadius:9,cursor:"pointer",fontSize:17,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:showInput?"#06b6d4":"#64748b"}}>
+          {showInput?"✕":"＋"}
+        </button>
+        <input value={q} onChange={e=>setQ(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")doSend();}}
+          placeholder="상황을 입력하세요..."
+          style={{flex:1,padding:"9px 13px",background:"#1e293b",border:"1.5px solid #334155",borderRadius:11,color:"#f1f5f9",fontSize:13,outline:"none"}}/>
+        <button onClick={doSend}
+          style={{width:38,height:38,background:(q.trim()||img)?"linear-gradient(135deg,#0891b2,#0284c7)":"#1e293b",border:"none",borderRadius:9,cursor:"pointer",fontSize:15,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,color:"#fff"}}>
+          ↑
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── 상세 대응 화면 (공통) ─────────────────────────────────────────
+function DetailScreen({type,query,isDisaster}){
+  const [tab,setTab]=useState(0);
+  const kb=ALL_KB[type]||ALL_KB["홍수"];
+  const tabs=isDisaster?["행동","조치","전문가","R&D","지식DB"]:["행동","조치","법령","지식DB"];
+  return(
+    <div style={{padding:"16px"}}>
+      <div style={{background:kb.grad,borderRadius:18,padding:"18px",marginBottom:14,position:"relative",overflow:"hidden"}}>
+        <div style={{position:"absolute",right:-16,top:-16,fontSize:80,opacity:.1}}>{kb.icon}</div>
+        <div style={{fontSize:11,color:"rgba(255,255,255,.7)",marginBottom:2}}>온톨로지 기반 AI 분석</div>
+        <div style={{fontSize:17,fontWeight:800,color:"#fff",marginBottom:5}}>{kb.icon} {type}</div>
+        <div style={{fontSize:11,color:"rgba(255,255,255,.85)",lineHeight:1.6,marginBottom:8}}>{query||type+" 상황 분석"}</div>
+        <div style={{display:"flex",gap:4}}>
+          {["특허 "+kb.patents.length+"건","논문 "+kb.papers.length+"건","법령 "+kb.laws.length+"건"].map(b=>(
+            <span key={b} style={{background:"rgba(255,255,255,.2)",color:"#fff",borderRadius:20,padding:"2px 8px",fontSize:9,fontWeight:700}}>{b}</span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{display:"flex",gap:5,marginBottom:12,overflowX:"auto"}}>
+        {tabs.map((label,i)=>(
+          <button key={i} onClick={()=>setTab(i)}
+            style={{padding:"7px 10px",background:tab===i?kb.color:"#1e293b",border:"1.5px solid "+(tab===i?kb.color:"#1e2d45"),borderRadius:9,cursor:"pointer",color:tab===i?"#fff":"#64748b",fontSize:11,fontWeight:800,flexShrink:0}}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <div style={{background:"#1e293b",borderRadius:14,padding:"14px",marginBottom:12,border:"1px solid "+kb.color+"22",minHeight:150}}>
+        {tab===0&&kb.actions.map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"7px 0",borderBottom:i<kb.actions.length-1?"1px solid #334155":"none"}}>
+            <div style={{width:20,height:20,borderRadius:"50%",background:kb.color+"22",color:kb.color,fontSize:10,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{i+1}</div>
+            <span style={{fontSize:12,color:"#cbd5e1",lineHeight:1.6}}>{item}</span>
+          </div>
+        ))}
+        {tab===1&&kb.measures.map((item,i)=>(
+          <div key={i} style={{marginBottom:i<kb.measures.length-1?10:0}}>
+            {/* 조치 내용 */}
+            <div style={{display:"flex",gap:10,alignItems:"flex-start",marginBottom:5}}>
+              <div style={{width:20,height:20,borderRadius:"50%",background:"#f59e0b22",color:"#f59e0b",fontSize:10,fontWeight:800,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,marginTop:1}}>{i+1}</div>
+              <span style={{fontSize:12,color:"#e2e8f0",lineHeight:1.6,fontWeight:600}}>{typeof item==="string"?item:item.action}</span>
+            </div>
+            {/* 근거 법령 — 객체일 때만 */}
+            {item&&item.law&&(
+              <div style={{marginLeft:30,padding:"6px 10px",background:"#f59e0b11",borderRadius:8,border:"1px solid #f59e0b33",display:"flex",gap:8,alignItems:"flex-start"}}>
+                <span style={{fontSize:10,color:"#f59e0b",fontWeight:800,flexShrink:0,marginTop:1}}>⚖️</span>
+                <div>
+                  <div style={{fontSize:10,fontWeight:700,color:"#f59e0b"}}>{item.law}</div>
+                  <div style={{fontSize:10,color:"#94a3b8",marginTop:1}}>{item.lawdesc}</div>
+                </div>
+              </div>
+            )}
+            {i<kb.measures.length-1&&<div style={{height:1,background:"#334155",marginTop:8}}/>}
+          </div>
+        ))}
+        {/* 4대재난: 전문가 탭 */}
+        {isDisaster&&tab===2&&kb.experts&&(
+          <div style={{display:"flex",flexDirection:"column",gap:7}}>
+            {kb.experts.map((ex,i)=>(
+              <div key={i} style={{background:"#0f172a",borderRadius:10,padding:"10px 12px",display:"flex",justifyContent:"space-between",border:"1px solid #1e2d45"}}>
+                <div><div style={{fontSize:10,color:"#64748b",marginBottom:2}}>원인</div><div style={{fontSize:12,color:"#e2e8f0",fontWeight:600}}>{ex.c}</div></div>
+                <div style={{textAlign:"right"}}><div style={{fontSize:10,color:"#64748b",marginBottom:2}}>적임 기술사</div><div style={{fontSize:11,color:kb.color,fontWeight:700}}>{ex.e}</div></div>
+              </div>
+            ))}
+          </div>
+        )}
+        {/* 4대재난: R&D 탭 */}
+        {isDisaster&&tab===3&&kb.rnd&&kb.rnd.map((item,i)=>(
+          <div key={i} style={{display:"flex",gap:9,padding:"8px 0",borderBottom:i<kb.rnd.length-1?"1px solid #334155":"none"}}>
+            <span style={{color:"#8b5cf6",fontSize:14,flexShrink:0}}>🔬</span>
+            <span style={{fontSize:12,color:"#cbd5e1",lineHeight:1.6}}>{item}</span>
+          </div>
+        ))}
+        {/* 기상: 법령 탭 */}
+        {!isDisaster&&tab===2&&kb.laws.map((law,i)=>(
+          <div key={i} style={{background:"#0f172a",borderRadius:10,padding:"10px 12px",marginBottom:6,border:"1px solid #f59e0b22"}}>
+            <div style={{fontSize:11,fontWeight:700,color:"#f59e0b",marginBottom:3}}>{law.name}</div>
+            <div style={{fontSize:10,color:"#94a3b8",lineHeight:1.5}}>{law.article}</div>
+          </div>
+        ))}
+        {/* 지식DB 탭 (마지막) */}
+        {tab===tabs.length-1&&(
+          <div style={{display:"flex",flexDirection:"column",gap:6}}>
+            {kb.patents.map((p,i)=>(
+              <div key={i} style={{background:"#0f172a",borderRadius:9,padding:"9px 11px",border:"1px solid #06b6d422"}}>
+                <div style={{display:"flex",justifyContent:"space-between",marginBottom:3}}>
+                  <span style={{fontSize:9,color:"#06b6d4",fontWeight:700,background:"#06b6d418",borderRadius:4,padding:"1px 5px"}}>{p.no}</span>
+                  <span style={{fontSize:9,color:"#475569"}}>{p.year}</span>
+                </div>
+                <div style={{fontSize:11,fontWeight:600,color:"#e2e8f0",lineHeight:1.4,marginBottom:2}}>{p.title}</div>
+                <div style={{fontSize:10,color:"#64748b"}}>{p.applicant}</div>
+              </div>
+            ))}
+            {kb.papers.map((p,i)=>(
+              <div key={i} style={{background:"#0f172a",borderRadius:9,padding:"9px 11px",border:"1px solid #10b98122"}}>
+                <div style={{fontSize:11,fontWeight:600,color:"#e2e8f0",lineHeight:1.4,marginBottom:2}}>{p.title}</div>
+                <div style={{fontSize:10,color:"#10b981",fontWeight:600}}>{p.journal}</div>
+                <div style={{fontSize:10,color:"#475569",marginTop:1}}>{p.authors} · {p.year}</div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── APP ───────────────────────────────────────────────────────────
+export default function App(){
+  const [mainTab,setMainTab]=useState("disaster");
+  const [screen,setScreen]=useState("chat");
+  const [selType,setSelType]=useState(null);
+  const [selQuery,setSelQuery]=useState("");
+  const [expertModal,setExpertModal]=useState(null); // null | {cert,title,source,step,rating,issues}
+  const scrollRef=useRef(null);
+  useEffect(()=>{ scrollRef.current&&scrollRef.current.scrollTo(0,0); },[screen,mainTab]);
+
+  const goDetail=(type,query)=>{ setSelType(type); setSelQuery(query); setScreen("detail"); };
+  const isDisaster=DISASTER_CATS.includes(selType);
+  const askExpert=(cert,title,source)=>setExpertModal({cert,title,source,step:"connect"});
+
+  // 피드백 저장
+  const saveFeedback=async(modal,rating,issues)=>{
+    const record={
+      id:"F"+Date.now(),
+      ts:new Date().toISOString(),
+      type:selType||"미분류",
+      cert:modal.cert,
+      title:modal.title,
+      source:modal.source,
+      rating, // "satisfied" | "insufficient"
+      issues:issues||[], // ["전문가","정보","속도","기타"]
+      rndNeeded: rating==="insufficient"&&issues&&issues.includes("정보"),
+    };
+    try{
+      let logs=[];
+      try{ const p=await window.storage.get("feedback-logs"); if(p)logs=JSON.parse(p.value); }catch(e){}
+      logs.unshift(record);
+      await window.storage.set("feedback-logs",JSON.stringify(logs.slice(0,200)));
+      // 미흡 누적 카운트
+      const insuf=logs.filter(l=>l.rating==="insufficient").length;
+      await window.storage.set("feedback-insufficient-count",String(insuf));
+    }catch(e){}
+    return record;
+  };
+
+  return(
+    <div style={{fontFamily:"'Noto Sans KR','Pretendard',sans-serif",background:"#0a0f1e",minHeight:"100vh",display:"flex",justifyContent:"center"}}>
+      <style>{"@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;700;900&display=swap');*{box-sizing:border-box;margin:0;padding:0;}input::placeholder{color:#475569;}button{font-family:inherit;}button:active{opacity:.8;}::-webkit-scrollbar{width:2px;}::-webkit-scrollbar-thumb{background:#334155;}"}</style>
+      <div style={{width:"100%",maxWidth:430,background:"#0a0f1e",minHeight:"100vh",display:"flex",flexDirection:"column",position:"relative"}}>
+
+        {/* 헤더 */}
+        <div style={{background:"#0d1526",borderBottom:"1px solid #1a2744",padding:"12px 20px",display:"flex",alignItems:"center",gap:12,position:"sticky",top:0,zIndex:20,flexShrink:0}}>
+          {screen==="detail"
+            ?<button onClick={()=>setScreen("chat")} style={{background:"#1e293b",border:"1px solid #334155",borderRadius:9,width:32,height:32,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",color:"#94a3b8",fontSize:15}}>←</button>
+            :<div style={{width:32,height:32,background:"linear-gradient(135deg,#0891b2,#0284c7)",borderRadius:9,display:"flex",alignItems:"center",justifyContent:"center",fontSize:16}}>🚨</div>
+          }
+          <div style={{flex:1}}>
+            <div style={{fontSize:15,fontWeight:900,color:"#f1f5f9",letterSpacing:-.5}}>재난톡</div>
+            <div style={{fontSize:10,color:"#475569",marginTop:1}}>온톨로지 기반 · 특허·논문·법령 연계</div>
+          </div>
+          {screen==="detail"&&selType&&ALL_KB[selType]&&(
+            <div style={{background:ALL_KB[selType].color+"22",color:ALL_KB[selType].color,border:"1px solid "+ALL_KB[selType].color+"44",borderRadius:20,padding:"3px 10px",fontSize:11,fontWeight:700}}>
+              {ALL_KB[selType].icon} {selType}
+            </div>
+          )}
+        </div>
+
+        {/* 메인 탭 */}
+        {screen==="chat"&&(
+          <div style={{display:"flex",background:"#0d1526",borderBottom:"1px solid #1a2744",padding:"0 16px",flexShrink:0}}>
+            {[["disaster","🏚️ 4대 재난","홍수·화재·산사태·지진"],["weather","🌦️ 기상 재난","폭염·한파·태풍·황사·집중호우"]].map(item=>(
+              <button key={item[0]} onClick={()=>setMainTab(item[0])}
+                style={{flex:1,padding:"10px 8px",background:"transparent",border:"none",borderBottom:"2px solid "+(mainTab===item[0]?"#06b6d4":"transparent"),cursor:"pointer",textAlign:"center"}}>
+                <div style={{fontSize:12,fontWeight:700,color:mainTab===item[0]?"#06b6d4":"#64748b"}}>{item[1]}</div>
+                <div style={{fontSize:10,color:mainTab===item[0]?"#0891b2":"#475569",marginTop:1}}>{item[2]}</div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {/* 콘텐츠 */}
+        <div ref={scrollRef} style={{flex:1,overflowY:"auto"}}>
+          {screen==="chat"&&mainTab==="disaster"&&<ChatBot cats={DISASTER_CATS} label="재난" onGoDetail={goDetail}/>}
+          {screen==="chat"&&mainTab==="weather"&&<ChatBot cats={WEATHER_CATS} label="기상" onGoDetail={goDetail}/>}
+          {screen==="detail"&&selType&&<DetailScreen type={selType} query={selQuery} isDisaster={isDisaster}/>}
+          {screen==="detail"&&selType&&<KnowledgeAccordion type={selType} onAskExpert={askExpert}/>}
+        </div>
+
+        {/* 전문가 연결 + 피드백 모달 */}
+        {expertModal&&(
+          <div style={{position:"absolute",inset:0,background:"#00000090",zIndex:100,display:"flex",alignItems:"flex-end"}}
+            onClick={()=>setExpertModal(null)}>
+            <div style={{width:"100%",background:"#0d1526",borderRadius:"20px 20px 0 0",padding:"20px 20px 28px",border:"1px solid #1a2744",maxHeight:"85vh",overflowY:"auto"}}
+              onClick={e=>e.stopPropagation()}>
+              <div style={{width:36,height:4,background:"#334155",borderRadius:2,margin:"0 auto 18px"}}/>
+
+              {/* STEP 1: 전문가 연결 */}
+              {expertModal.step==="connect"&&(
+                <div>
+                  <div style={{fontSize:11,color:"#64748b",marginBottom:5}}>{expertModal.source} 기반 전문가 연결</div>
+                  <div style={{fontSize:13,fontWeight:700,color:"#e2e8f0",lineHeight:1.5,marginBottom:14,padding:"10px 12px",background:"#1e293b",borderRadius:10,border:"1px solid #334155"}}>
+                    "{expertModal.title}"
+                  </div>
+                  <div style={{background:"#1e293b",borderRadius:14,padding:"14px",marginBottom:14,border:"1px solid #06b6d444"}}>
+                    <div style={{fontSize:11,color:"#06b6d4",fontWeight:700,marginBottom:10}}>👷 추천 기술사</div>
+                    <div style={{display:"flex",alignItems:"center",gap:12}}>
+                      <div style={{width:44,height:44,borderRadius:12,background:"linear-gradient(135deg,#0891b2,#0e7490)",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:"#fff",fontWeight:900,flexShrink:0}}>전</div>
+                      <div style={{flex:1}}>
+                        <div style={{fontSize:14,fontWeight:800,color:"#f1f5f9"}}>{expertModal.cert}</div>
+                        <div style={{fontSize:11,color:"#64748b",marginTop:2}}>한국기술사회 소속 · 관련 분야 전문</div>
+                        <div style={{fontSize:11,color:"#f59e0b",marginTop:2}}>★★★★★ 4.9</div>
+                      </div>
+                      <div style={{textAlign:"right"}}>
+                        <div style={{fontSize:22,fontWeight:900,color:"#10b981"}}>95</div>
+                        <div style={{fontSize:10,color:"#64748b"}}>적합도</div>
+                      </div>
+                    </div>
+                  </div>
+                  <button onClick={()=>setExpertModal({...expertModal,step:"feedback_request"})}
+                    style={{width:"100%",padding:"14px",background:"linear-gradient(135deg,#0891b2,#0284c7)",border:"none",borderRadius:13,color:"#fff",fontSize:14,fontWeight:800,cursor:"pointer",marginBottom:8}}>
+                    📞 {expertModal.cert} 상담 연결하기
+                  </button>
+                  <button onClick={()=>setExpertModal(null)}
+                    style={{width:"100%",padding:"10px",background:"transparent",border:"none",color:"#64748b",fontSize:13,cursor:"pointer"}}>
+                    닫기
+                  </button>
+                </div>
+              )}
+
+              {/* STEP 2: 상담 완료 후 피드백 요청 */}
+              {expertModal.step==="feedback_request"&&(
+                <div>
+                  <div style={{textAlign:"center",marginBottom:16}}>
+                    <div style={{fontSize:36,marginBottom:8}}>💬</div>
+                    <div style={{fontSize:16,fontWeight:900,color:"#f1f5f9",marginBottom:4}}>상담이 완료되었습니다</div>
+                    <div style={{fontSize:12,color:"#64748b"}}>{expertModal.cert}와의 상담 — 어떠셨나요?</div>
+                  </div>
+                  <div style={{fontSize:12,color:"#94a3b8",textAlign:"center",marginBottom:14,padding:"8px 12px",background:"#1e293b",borderRadius:10,border:"1px solid #334155"}}>
+                    "{expertModal.title}"
+                  </div>
+                  <div style={{display:"flex",gap:10,marginBottom:10}}>
+                    <button onClick={async()=>{
+                      await saveFeedback(expertModal,"satisfied",[]);
+                      setExpertModal({...expertModal,step:"done_satisfied"});
+                    }}
+                      style={{flex:1,padding:"16px 8px",background:"#10b98122",border:"2px solid #10b98155",borderRadius:14,cursor:"pointer",textAlign:"center"}}>
+                      <div style={{fontSize:28,marginBottom:5}}>😊</div>
+                      <div style={{fontSize:13,fontWeight:800,color:"#10b981"}}>만족했어요</div>
+                      <div style={{fontSize:10,color:"#64748b",marginTop:2}}>문제가 해결됐어요</div>
+                    </button>
+                    <button onClick={()=>setExpertModal({...expertModal,step:"feedback_issues",selected:[]})}
+                      style={{flex:1,padding:"16px 8px",background:"#f43f5e22",border:"2px solid #f43f5e55",borderRadius:14,cursor:"pointer",textAlign:"center"}}>
+                      <div style={{fontSize:28,marginBottom:5}}>😞</div>
+                      <div style={{fontSize:13,fontWeight:800,color:"#f43f5e"}}>미흡했어요</div>
+                      <div style={{fontSize:10,color:"#64748b",marginTop:2}}>아직 해결이 안 됐어요</div>
+                    </button>
+                  </div>
+                  <button onClick={()=>setExpertModal(null)}
+                    style={{width:"100%",padding:"10px",background:"transparent",border:"none",color:"#64748b",fontSize:12,cursor:"pointer"}}>
+                    나중에 평가할게요
+                  </button>
+                </div>
+              )}
+
+              {/* STEP 3: 미흡 — 무엇이 미흡했나 */}
+              {expertModal.step==="feedback_issues"&&(
+                <div>
+                  <div style={{textAlign:"center",marginBottom:16}}>
+                    <div style={{fontSize:28,marginBottom:8}}>🔍</div>
+                    <div style={{fontSize:15,fontWeight:900,color:"#f1f5f9",marginBottom:4}}>무엇이 미흡했나요?</div>
+                    <div style={{fontSize:11,color:"#64748b"}}>해당하는 항목을 모두 선택해 주세요</div>
+                  </div>
+                  {[
+                    {key:"전문가",icon:"👷",label:"전문가 전문성",desc:"기대한 것보다 전문 지식이 부족했어요"},
+                    {key:"정보",icon:"📄",label:"특허·논문 정보",desc:"관련 기술 정보가 부족하거나 부정확했어요"},
+                    {key:"속도",icon:"⏱️",label:"대응 속도",desc:"전문가 연결이 너무 오래 걸렸어요"},
+                    {key:"매칭",icon:"🎯",label:"전문가 매칭",desc:"제 문제에 맞는 전문가가 아니었어요"},
+                    {key:"기타",icon:"💬",label:"기타",desc:"다른 이유가 있어요"},
+                  ].map(item=>{
+                    const sel=expertModal.selected||[];
+                    const isOn=sel.includes(item.key);
+                    return(
+                      <button key={item.key}
+                        onClick={()=>setExpertModal({...expertModal,selected:isOn?sel.filter(s=>s!==item.key):[...sel,item.key]})}
+                        style={{width:"100%",padding:"12px 14px",background:isOn?"#f43f5e18":"#1e293b",border:"1.5px solid "+(isOn?"#f43f5e":"#334155"),borderRadius:12,cursor:"pointer",textAlign:"left",display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                        <span style={{fontSize:20,flexShrink:0}}>{item.icon}</span>
+                        <div style={{flex:1}}>
+                          <div style={{fontSize:13,fontWeight:700,color:isOn?"#f43f5e":"#e2e8f0"}}>{item.label}</div>
+                          <div style={{fontSize:11,color:"#64748b",marginTop:1}}>{item.desc}</div>
+                        </div>
+                        <div style={{width:20,height:20,borderRadius:"50%",background:isOn?"#f43f5e":"#334155",border:"2px solid "+(isOn?"#f43f5e":"#475569"),display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>
+                          {isOn&&<span style={{color:"#fff",fontSize:11,fontWeight:800}}>✓</span>}
+                        </div>
+                      </button>
+                    );
+                  })}
+                  <button
+                    disabled={!(expertModal.selected&&expertModal.selected.length>0)}
+                    onClick={async()=>{
+                      const rec=await saveFeedback(expertModal,"insufficient",expertModal.selected);
+                      setExpertModal({...expertModal,step:"done_insufficient",record:rec});
+                    }}
+                    style={{width:"100%",padding:"13px",background:(expertModal.selected&&expertModal.selected.length>0)?"#f43f5e":"#334155",border:"none",borderRadius:13,color:"#fff",fontSize:13,fontWeight:800,cursor:"pointer",marginTop:4,marginBottom:8,opacity:(expertModal.selected&&expertModal.selected.length>0)?1:.5}}>
+                    피드백 제출하기
+                  </button>
+                  <button onClick={()=>setExpertModal({...expertModal,step:"feedback_request"})}
+                    style={{width:"100%",padding:"10px",background:"transparent",border:"none",color:"#64748b",fontSize:12,cursor:"pointer"}}>
+                    ← 뒤로
+                  </button>
+                </div>
+              )}
+
+              {/* STEP 4a: 만족 완료 */}
+              {expertModal.step==="done_satisfied"&&(
+                <div style={{textAlign:"center",padding:"10px 0"}}>
+                  <div style={{fontSize:48,marginBottom:12}}>🎉</div>
+                  <div style={{fontSize:17,fontWeight:900,color:"#10b981",marginBottom:8}}>피드백 감사합니다!</div>
+                  <div style={{fontSize:13,color:"#64748b",lineHeight:1.7,marginBottom:20}}>
+                    만족 피드백이 저장되었습니다.<br/>
+                    해결 사례가 DB에 축적되어<br/>다음 사용자에게 더 나은 매칭을 제공합니다.
+                  </div>
+                  <div style={{background:"#10b98118",border:"1px solid #10b98133",borderRadius:12,padding:"12px",marginBottom:16,display:"flex",alignItems:"center",gap:10}}>
+                    <span style={{fontSize:20}}>🗄️</span>
+                    <div style={{textAlign:"left"}}>
+                      <div style={{fontSize:12,fontWeight:700,color:"#10b981"}}>피드백 DB 저장 완료</div>
+                      <div style={{fontSize:11,color:"#64748b",marginTop:1}}>만족 · {expertModal.cert} · {new Date().toLocaleDateString("ko-KR")}</div>
+                    </div>
+                  </div>
+                  <button onClick={()=>setExpertModal(null)}
+                    style={{width:"100%",padding:"13px",background:"linear-gradient(135deg,#059669,#047857)",border:"none",borderRadius:13,color:"#fff",fontSize:13,fontWeight:800,cursor:"pointer"}}>
+                    확인
+                  </button>
+                </div>
+              )}
+
+              {/* STEP 4b: 미흡 완료 + R&D 제안 */}
+              {expertModal.step==="done_insufficient"&&(
+                <div style={{textAlign:"center",padding:"10px 0"}}>
+                  <div style={{fontSize:44,marginBottom:12}}>📋</div>
+                  <div style={{fontSize:16,fontWeight:900,color:"#f43f5e",marginBottom:8}}>미흡 피드백이 접수됐습니다</div>
+                  <div style={{fontSize:12,color:"#64748b",lineHeight:1.7,marginBottom:14}}>
+                    소중한 의견 감사합니다.<br/>
+                    미흡 사항은 DB에 기록되어<br/>매칭 알고리즘 개선에 활용됩니다.
+                  </div>
+                  {/* 미흡 항목 요약 */}
+                  <div style={{background:"#1e293b",borderRadius:12,padding:"12px",marginBottom:14,textAlign:"left",border:"1px solid #334155"}}>
+                    <div style={{fontSize:11,color:"#64748b",fontWeight:700,marginBottom:8}}>접수된 미흡 항목</div>
+                    {(expertModal.selected||[]).map(s=>(
+                      <div key={s} style={{display:"flex",gap:8,alignItems:"center",fontSize:12,color:"#e2e8f0",marginBottom:4}}>
+                        <span style={{color:"#f43f5e"}}>●</span>{s}
+                      </div>
+                    ))}
+                  </div>
+                  {/* 정보 미흡이면 R&D 제안 */}
+                  {(expertModal.selected||[]).includes("정보")&&(
+                    <div style={{background:"linear-gradient(135deg,#4c1d9522,#6d28d922)",border:"1px solid #8b5cf644",borderRadius:12,padding:"14px",marginBottom:14,textAlign:"left"}}>
+                      <div style={{fontSize:12,fontWeight:800,color:"#a78bfa",marginBottom:6}}>🔬 R&D 과제화 자동 제안</div>
+                      <div style={{fontSize:11,color:"#94a3b8",lineHeight:1.6,marginBottom:8}}>
+                        특허·논문 정보 미흡이 반복되고 있습니다.<br/>
+                        해당 분야 R&D 과제로 전환을 제안합니다.
+                      </div>
+                      <div style={{fontSize:11,color:"#8b5cf6",fontWeight:700}}>
+                        {selType||"재난"} 분야 기술 공백 → NTB 연계 R&D 과제
+                      </div>
+                    </div>
+                  )}
+                  <div style={{background:"#f43f5e11",border:"1px solid #f43f5e33",borderRadius:12,padding:"10px",marginBottom:16,display:"flex",alignItems:"center",gap:10,textAlign:"left"}}>
+                    <span style={{fontSize:18}}>🗄️</span>
+                    <div>
+                      <div style={{fontSize:11,fontWeight:700,color:"#f43f5e"}}>미흡 피드백 DB 저장</div>
+                      <div style={{fontSize:10,color:"#64748b",marginTop:1}}>매칭 알고리즘 개선 데이터로 활용</div>
+                    </div>
+                  </div>
+                  <button onClick={()=>setExpertModal(null)}
+                    style={{width:"100%",padding:"13px",background:"#1e293b",border:"1px solid #334155",borderRadius:13,color:"#94a3b8",fontSize:13,cursor:"pointer"}}>
+                    닫기
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(React.createElement(App));
+  </script>
+</body>
+</html>
