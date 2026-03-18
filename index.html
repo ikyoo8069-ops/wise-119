@@ -4,1196 +4,1307 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>재난톡 · 119tok</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Noto+Sans+JP:wght@400;700&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet"/>
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet"/>
 <style>
-:root{
-  --red:#E53E3E;--red2:#C53030;--orange:#DD6B20;--amber:#D69E2E;
-  --blue:#3182CE;--teal:#2C7A7B;--green:#276749;--gray9:#1A202C;
-  --gray8:#2D3748;--gray7:#4A5568;--gray5:#718096;--gray3:#CBD5E0;
-  --gray1:#F7FAFC;--white:#FFFFFF;
-  --card-bg:#FFFFFF;--body-bg:#F0F4F8;
-  --shadow:0 2px 8px rgba(0,0,0,.12);
-  --radius:12px;
-}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Noto Sans KR',sans-serif;background:var(--body-bg);color:var(--gray9);min-height:100vh;}
-#root{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:var(--white);}
+body{font-family:'Noto Sans KR',sans-serif;background:#0a1628;color:#f1f5f9;min-height:100vh;}
+#app{max-width:480px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;background:#0a1628;}
+::-webkit-scrollbar{width:3px;}
+::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:2px;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
 
-/* ── HEADER ── */
-.hdr{background:linear-gradient(135deg,#C53030 0%,#E53E3E 60%,#DD6B20 100%);
-  color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:100;
-  box-shadow:0 2px 8px rgba(200,30,30,.35);}
-.hdr-top{display:flex;align-items:center;justify-content:space-between;}
-.hdr-logo{font-size:1.25rem;font-weight:900;letter-spacing:-.5px;}
-.hdr-logo span{opacity:.75;font-weight:400;font-size:.85rem;margin-left:6px;}
-.hdr-actions{display:flex;gap:8px;align-items:center;}
-.lang-sel{background:rgba(255,255,255,.18);border:none;color:#fff;
-  border-radius:20px;padding:4px 10px;font-size:.8rem;cursor:pointer;
-  appearance:none;-webkit-appearance:none;}
-.lang-sel option{color:#000;}
-.icon-btn{background:rgba(255,255,255,.18);border:none;color:#fff;
-  width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;
-  display:flex;align-items:center;justify-content:center;}
-.dis-tabs{display:flex;gap:6px;margin-top:10px;overflow-x:auto;padding-bottom:2px;}
-.dis-tabs::-webkit-scrollbar{display:none;}
-.dis-tab{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);
-  color:#fff;border-radius:20px;padding:5px 13px;font-size:.78rem;
-  cursor:pointer;white-space:nowrap;transition:.15s;}
-.dis-tab.active,.dis-tab:hover{background:rgba(255,255,255,.95);color:var(--red);
-  border-color:transparent;font-weight:700;}
+/* 헤더 */
+#header{background:#0f2040;border-bottom:1px solid #1e3a5f;padding:12px 16px;flex-shrink:0;}
+.hdr-top{display:flex;align-items:center;gap:10;margin-bottom:10px;}
+.hdr-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,#ff4757,#ff6b2b);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.hdr-title{font-weight:900;font-size:1.1rem;color:#f1f5f9;}
+.hdr-sub{font-size:10px;color:#64748b;}
+.main-tabs{display:flex;gap:6px;}
+.main-tab{flex:1;padding:8px 0;border-radius:10px;cursor:pointer;border:1px solid #2d5a7b;background:#1a3050;color:#94a3b8;font-weight:400;font-size:13px;text-align:center;transition:.15s;font-family:inherit;}
+.main-tab.active{border-color:#00D4AA;background:rgba(0,212,170,.12);color:#00D4AA;font-weight:700;}
+.main-tab-sub{font-size:10px;margin-top:2px;color:#64748b;}
+.main-tab.active .main-tab-sub{color:rgba(0,212,170,.7);}
 
-/* ── BODY TABS ── */
-.body-tabs{display:flex;border-bottom:2px solid var(--gray3);background:#fff;
-  position:sticky;top:95px;z-index:90;}
-.body-tab{flex:1;padding:10px 4px;text-align:center;font-size:.8rem;
-  color:var(--gray5);border-bottom:3px solid transparent;cursor:pointer;
-  transition:.15s;margin-bottom:-2px;}
-.body-tab.active{color:var(--red);border-bottom-color:var(--red);font-weight:700;}
+/* 바디 탭 */
+#body-tabs{display:flex;border-bottom:1px solid #1e3a5f;background:#0f2040;flex-shrink:0;}
+.body-tab{flex:1;padding:9px 4px;text-align:center;font-size:12px;color:#64748b;border-bottom:2px solid transparent;cursor:pointer;font-weight:400;transition:.15s;font-family:inherit;background:none;border-top:none;border-left:none;border-right:none;}
+.body-tab.active{color:#00D4AA;border-bottom-color:#00D4AA;font-weight:700;}
 
-/* ── CHAT ── */
-.chat-area{flex:1;overflow-y:auto;padding:14px 12px;display:flex;flex-direction:column;gap:10px;min-height:300px;}
-.msg{max-width:88%;display:flex;flex-direction:column;gap:3px;}
-.msg.bot{align-self:flex-start;}
+/* 콘텐츠 영역 */
+#content{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+
+/* 재난 유형 버튼 */
+#dis-btns{padding:10px 12px;border-bottom:1px solid #1e3a5f;background:#0f2040;flex-shrink:0;}
+.dis-btn-row{display:flex;gap:6px;}
+.dis-btn{flex:1;padding:8px 2px;background:#1a3050;border:1px solid rgba(255,255,255,.1);border-radius:10px;cursor:pointer;text-align:center;font-family:inherit;transition:.15s;}
+.dis-btn:hover{border-color:rgba(0,212,170,.4);}
+.dis-btn-icon{font-size:20px;margin-bottom:2px;}
+.dis-btn-label{font-size:10px;font-weight:700;}
+
+/* 채팅 */
+#chat-area{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;}
+.msg{display:flex;flex-direction:column;max-width:88%;gap:3px;animation:fadeIn .2s ease;}
 .msg.user{align-self:flex-end;}
-.msg-bubble{padding:10px 14px;border-radius:18px;font-size:.88rem;line-height:1.55;}
-.msg.bot .msg-bubble{background:var(--gray1);border-bottom-left-radius:4px;}
-.msg.user .msg-bubble{background:var(--red);color:#fff;border-bottom-right-radius:4px;}
-.msg-time{font-size:.7rem;color:var(--gray5);padding:0 4px;}
+.msg.bot{align-self:flex-start;}
+.bubble{padding:10px 14px;font-size:13px;line-height:1.6;white-space:pre-wrap;}
+.msg.user .bubble{border-radius:18px 18px 4px 18px;background:#0891b2;color:#f1f5f9;}
+.msg.bot .bubble{border-radius:18px 18px 18px 4px;background:#1e293b;color:#f1f5f9;}
+.msg-time{font-size:10px;color:#64748b;padding:0 4px;}
 .msg.user .msg-time{text-align:right;}
 
-/* Result cards */
-.result-card{background:var(--gray1);border-radius:var(--radius);padding:12px;margin-top:4px;border-left:4px solid var(--red);}
-.result-card h4{font-size:.82rem;color:var(--red);margin-bottom:8px;font-weight:700;}
-.step-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;}
-.step-badge{background:var(--red);color:#fff;border-radius:8px;padding:2px 8px;
-  font-size:.7rem;font-weight:700;white-space:nowrap;margin-top:1px;}
-.step-text{font-size:.82rem;line-height:1.5;}
-.law-tag{display:inline-flex;align-items:center;gap:3px;background:#EBF8FF;
-  color:var(--blue);border:1px solid #BEE3F8;border-radius:6px;
-  padding:2px 7px;font-size:.7rem;margin-top:3px;cursor:pointer;}
+/* 결과 카드 */
+.result-card{background:#1a3050;border-radius:12px;padding:12px;margin-top:4px;}
+.result-title{font-size:12px;font-weight:700;margin-bottom:8px;}
+.step-row{display:flex;gap:8px;margin-bottom:7px;align-items:flex-start;}
+.step-badge{border-radius:8px;padding:2px 8px;font-size:11px;font-weight:700;white-space:nowrap;margin-top:1px;flex-shrink:0;}
+.step-text{font-size:12px;line-height:1.5;color:#f1f5f9;}
 
-/* Accordion KB */
-.kb-section{margin-top:8px;}
-.kb-toggle{display:flex;align-items:center;justify-content:space-between;
-  background:var(--gray1);border:1px solid var(--gray3);border-radius:8px;
-  padding:8px 12px;cursor:pointer;font-size:.82rem;font-weight:600;}
-.kb-body{border:1px solid var(--gray3);border-top:none;border-radius:0 0 8px 8px;
-  padding:10px;display:none;}
+/* 5단계 탭 */
+.step-tabs{display:flex;gap:0;margin:10px 0 0;border-radius:8px;overflow:hidden;border:1px solid #2d5a7b;}
+.step-tab{flex:1;padding:7px 1px;text-align:center;font-size:10px;cursor:pointer;background:#1a3050;color:#64748b;border:none;font-family:inherit;font-weight:600;transition:.15s;border-right:1px solid #2d5a7b;}
+.step-tab:last-child{border-right:none;}
+.step-tab.active{color:#0a1628;font-weight:700;}
+.step-tab-icon{font-size:13px;display:block;margin-bottom:2px;}
+.step-panel{display:none;padding:10px 0 4px;}
+.step-panel.active{display:block;}
+.step-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid #1e3a5f;font-size:12px;color:#f1f5f9;line-height:1.5;}
+.step-item:last-child{border:none;}
+.step-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;margin-top:1px;}
+.law-pill{display:inline-block;background:rgba(59,130,246,.15);color:#60a5fa;border:1px solid rgba(59,130,246,.3);border-radius:4px;padding:1px 6px;font-size:10px;margin-top:3px;}
+.ai-box{margin-top:8px;padding:8px;background:#0f2040;border-radius:8px;font-size:12px;color:#94a3b8;line-height:1.5;}
+/* R&D 미흡 체크박스 */
+.rnd-issue{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid #1e3a5f;font-size:12px;cursor:pointer;}
+.rnd-issue:last-child{border:none;}
+.rnd-check{width:18px;height:18px;border-radius:4px;border:1.5px solid #2d5a7b;background:#1a3050;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;}
+.rnd-check.sel{background:#f97316;border-color:#f97316;color:#fff;}
+.rnd-submit{width:100%;margin-top:10px;background:#f97316;color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.rnd-done{background:rgba(249,115,22,.12);border:1px solid rgba(249,115,22,.3);border-radius:8px;padding:10px;font-size:12px;color:#fb923c;text-align:center;margin-top:8px;}
+.kb-toggle{display:flex;align-items:center;justify-content:space-between;background:#1e3a5f;border:1px solid #2d5a7b;border-radius:8px;padding:8px 12px;cursor:pointer;font-size:12px;font-weight:600;color:#f1f5f9;margin-top:6px;}
+.kb-body{border:1px solid #2d5a7b;border-top:none;border-radius:0 0 8px 8px;padding:0 10px;background:#0f2040;display:none;}
 .kb-body.open{display:block;}
-.kb-item{display:flex;justify-content:space-between;align-items:center;
-  padding:5px 0;border-bottom:1px solid #EDF2F7;font-size:.8rem;}
-.kb-item:last-child{border:none;}
-.ask-btn{background:var(--teal);color:#fff;border:none;border-radius:6px;
-  padding:3px 8px;font-size:.7rem;cursor:pointer;white-space:nowrap;}
+.kb-row{padding:7px 0;border-bottom:1px solid #1e3a5f;display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#f1f5f9;}
+.kb-row:last-child{border:none;}
+.kb-row-info div:first-child{font-weight:600;}
+.kb-row-info div:last-child{font-size:11px;color:#64748b;margin-top:1px;}
+.ask-btn{background:#00D4AA;color:#0a1628;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;font-weight:700;white-space:nowrap;font-family:inherit;}
 
-/* Chat input */
-.chat-input-wrap{padding:10px 12px;border-top:1px solid var(--gray3);background:#fff;display:flex;flex-direction:column;gap:8px;}
+/* 예시 버튼 */
+.example-label{font-size:11px;color:#64748b;font-weight:600;margin-bottom:6px;}
+.example-btn{width:100%;background:#1e293b;border-radius:11px;padding:10px 13px;cursor:pointer;text-align:left;display:flex;align-items:center;gap:9px;margin-bottom:6px;font-family:inherit;border:1px solid rgba(255,255,255,.05);}
+.example-btn:hover{border-color:rgba(0,212,170,.3);}
+.example-cat{font-size:11px;font-weight:700;margin-bottom:1px;}
+.example-desc{font-size:11px;color:#94a3b8;}
+
+/* 타이핑 */
+.typing{display:flex;gap:4px;padding:10px 14px;background:#1e293b;border-radius:18px 18px 18px 4px;align-self:flex-start;}
+.typing span{width:7px;height:7px;border-radius:50%;background:#00D4AA;display:inline-block;opacity:.7;animation:bounce .9s infinite;}
+
+/* 입력창 */
+#chat-input-wrap{padding:8px 12px 10px;border-top:1px solid #1e3a5f;background:#0f2040;flex-shrink:0;}
+#plus-popup{display:none;gap:8px;margin-bottom:8px;animation:fadeIn .15s ease;}
+#plus-popup.show{display:flex;}
+.attach-btn{display:flex;align-items:center;gap:5px;background:#1a3050;border:1px solid #2d5a7b;border-radius:20px;padding:6px 13px;font-size:12px;cursor:pointer;color:#94a3b8;font-family:inherit;transition:.15s;}
+.attach-btn:hover{border-color:#00D4AA;color:#00D4AA;}
+.attach-btn.recording{border-color:#ff4757;color:#ff4757;background:rgba(255,71,87,.1);}
 .input-row{display:flex;gap:8px;align-items:flex-end;}
-.chat-input{flex:1;border:1.5px solid var(--gray3);border-radius:24px;
-  padding:9px 16px;font-size:.88rem;font-family:inherit;resize:none;
-  max-height:100px;outline:none;transition:.15s;}
-.chat-input:focus{border-color:var(--red);}
-.send-btn{background:var(--red);color:#fff;border:none;border-radius:50%;
-  width:42px;height:42px;cursor:pointer;font-size:1.1rem;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;transition:.1s;}
-.send-btn:disabled{background:var(--gray3);}
-.attach-row{display:flex;gap:6px;}
-.attach-btn{background:var(--gray1);border:1px solid var(--gray3);border-radius:20px;
-  padding:5px 12px;font-size:.75rem;cursor:pointer;color:var(--gray7);}
-.attach-btn:hover{background:var(--gray3);}
+#plus-btn{background:#1a3050;border:1px solid #2d5a7b;border-radius:50%;width:36px;height:36px;cursor:pointer;font-size:1.3rem;color:#94a3b8;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-weight:300;font-family:inherit;transition:.15s;}
+#plus-btn:hover{border-color:#00D4AA;color:#00D4AA;}
+#plus-btn.open{background:#00D4AA22;border-color:#00D4AA;color:#00D4AA;transform:rotate(45deg);}
+#chat-input{flex:1;background:#1a3050;border:1px solid #2d5a7b;border-radius:24px;padding:9px 16px;font-size:13px;font-family:inherit;resize:none;outline:none;color:#f1f5f9;max-height:80px;}
+#chat-input::placeholder{color:#64748b;}
+#chat-input:focus{border-color:#00D4AA;}
+#send-btn{background:#1a3050;color:#64748b;border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;font-weight:900;font-size:1rem;flex-shrink:0;font-family:inherit;transition:.15s;}
+#send-btn.active{background:#00D4AA;color:#0a1628;}
 
-/* ── EXPERT LIST ── */
-.expert-grid{padding:12px;}
-.expert-card{background:#fff;border:1px solid var(--gray3);border-radius:var(--radius);
-  padding:12px;margin-bottom:10px;cursor:pointer;transition:.15s;
-  display:flex;align-items:center;gap:12px;}
-.expert-card:hover{border-color:var(--teal);box-shadow:var(--shadow);}
-.expert-avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--teal),var(--green));
-  display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.1rem;flex-shrink:0;}
-.expert-info{flex:1;}
-.expert-name{font-weight:700;font-size:.9rem;}
-.expert-spec{font-size:.77rem;color:var(--teal);margin-top:2px;}
-.expert-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:5px;}
-.expert-tag{background:#E6FFFA;color:var(--teal);border-radius:4px;padding:1px 6px;font-size:.68rem;}
-.expert-avail{font-size:.7rem;color:var(--green);font-weight:600;}
+/* 전문가 탭 */
+#experts-tab{overflow-y:auto;flex:1;padding:12px;}
+.expert-count{font-size:12px;color:#64748b;margin-bottom:10px;}
+.expert-card{background:#0f2040;border:1px solid #1e3a5f;border-radius:12px;padding:12px;margin-bottom:10px;display:flex;align-items:center;gap:12px;cursor:pointer;}
+.expert-avatar{width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,#0891b2,#00D4AA);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.1rem;flex-shrink:0;}
+.expert-name{font-weight:700;font-size:14px;color:#f1f5f9;}
+.expert-spec{font-size:12px;color:#00D4AA;margin-top:2px;}
+.expert-meta{font-size:11px;color:#64748b;margin-top:2px;}
+.expert-tags{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px;}
+.expert-tag{border-radius:4px;padding:1px 6px;font-size:10px;}
+.expert-avail{font-size:11px;color:#00c875;margin-left:4px;}
 
-/* ── FEEDBACK LIST ── */
-.fb-list{padding:12px;}
-.fb-item{background:#fff;border:1px solid var(--gray3);border-radius:var(--radius);
-  padding:12px;margin-bottom:10px;}
-.fb-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-.fb-score{display:flex;gap:4px;}
-.score-dot{width:10px;height:10px;border-radius:50%;background:var(--gray3);}
-.score-dot.filled{background:var(--amber);}
-.fb-detail{font-size:.8rem;color:var(--gray7);line-height:1.5;}
-.rnd-badge{background:#FFF5F5;border:1px solid #FED7D7;border-radius:6px;
-  padding:4px 10px;font-size:.75rem;color:var(--red);margin-top:6px;display:inline-block;}
+/* 피드백 탭 */
+#feedback-tab{overflow-y:auto;flex:1;padding:12px;}
+.fb-card{background:#0f2040;border:1px solid #1e3a5f;border-radius:12px;padding:12px;margin-bottom:10px;}
+.fb-header{display:flex;justify-content:space-between;margin-bottom:8px;}
+.fb-name{font-weight:700;font-size:13px;color:#f1f5f9;}
+.fb-date{font-size:11px;color:#64748b;}
+.fb-dis{display:inline-block;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;color:#0a1628;margin-right:4px;}
+.fb-rating{font-size:12px;margin-top:4px;}
+.fb-issues{font-size:11px;color:#64748b;margin-top:4px;}
+.rnd-badge{background:rgba(255,71,87,.18);border:1px solid rgba(255,71,87,.4);border-radius:6px;padding:3px 8px;font-size:11px;color:#ff4757;margin-top:6px;display:inline-block;}
 
-/* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);
-  z-index:200;display:flex;align-items:flex-end;justify-content:center;}
-.modal-sheet{background:#fff;border-radius:20px 20px 0 0;width:100%;max-width:480px;
-  padding:20px;max-height:80vh;overflow-y:auto;animation:slideUp .25s ease;}
-@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
-.modal-handle{width:40px;height:4px;background:var(--gray3);border-radius:2px;
-  margin:0 auto 16px;}
-.modal-title{font-size:1rem;font-weight:700;margin-bottom:4px;}
-.modal-sub{font-size:.8rem;color:var(--gray5);margin-bottom:16px;}
-.modal-expert-card{background:var(--gray1);border-radius:10px;padding:14px;
-  display:flex;gap:12px;margin-bottom:16px;}
-.step-indicator{display:flex;gap:6px;margin-bottom:16px;}
-.step-dot{width:28px;height:4px;border-radius:2px;background:var(--gray3);}
-.step-dot.done{background:var(--red);}
-.fb-btn-row{display:flex;gap:10px;}
-.fb-btn{flex:1;padding:14px;border-radius:12px;border:2px solid var(--gray3);
-  cursor:pointer;font-size:.9rem;background:#fff;transition:.15s;text-align:center;}
-.fb-btn.good:hover,.fb-btn.good.sel{border-color:var(--green);background:#F0FFF4;color:var(--green);}
-.fb-btn.bad:hover,.fb-btn.bad.sel{border-color:var(--red);background:#FFF5F5;color:var(--red);}
+/* 이력 탭 */
+#history-tab{overflow-y:auto;flex:1;padding:12px;}
+.hist-card{background:#0f2040;border:1px solid #1e3a5f;border-radius:12px;padding:12px;margin-bottom:10px;cursor:pointer;}
+.hist-dis{display:inline-block;border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;color:#0a1628;margin-bottom:4px;}
+.hist-q{font-size:13px;font-weight:600;color:#f1f5f9;margin-bottom:3px;}
+.hist-date{font-size:11px;color:#64748b;}
+
+/* 빈 상태 */
+.empty-state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#64748b;padding:40px;}
+.empty-icon{font-size:3rem;margin-bottom:12px;}
+.empty-text{font-size:13px;text-align:center;line-height:1.6;}
+
+/* 보고서 탭 */
+#report-tab{overflow-y:auto;flex:1;padding:12px;}
+.report-ctrl{background:linear-gradient(135deg,#0f2040,#1a3050);border:1px solid #2d5a7b;border-radius:12px;padding:14px;margin-bottom:12px;}
+.report-ctrl-title{font-size:13px;font-weight:700;color:#f1f5f9;margin-bottom:10px;}
+.report-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;}
+.report-opt{background:#0a1628;border:1px solid #2d5a7b;border-radius:8px;padding:8px 10px;cursor:pointer;font-size:12px;color:#94a3b8;text-align:center;transition:.15s;font-family:inherit;}
+.report-opt.sel{border-color:#00D4AA;background:rgba(0,212,170,.1);color:#00D4AA;font-weight:700;}
+.report-gen-btn{width:100%;background:#00D4AA;color:#0a1628;border:none;border-radius:10px;padding:11px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.report-gen-btn:disabled{background:#1a3050;color:#64748b;}
+/* 보고서 본문 */
+.report-doc{background:#fff;color:#1a202c;border-radius:12px;padding:20px;font-size:12px;line-height:1.7;margin-top:4px;}
+.report-doc h1{font-size:15px;font-weight:900;text-align:center;margin-bottom:4px;color:#0f2040;}
+.report-doc h2{font-size:13px;font-weight:700;margin:14px 0 6px;color:#0f2040;border-bottom:2px solid #e2e8f0;padding-bottom:4px;}
+.report-doc h3{font-size:12px;font-weight:700;margin:10px 0 4px;color:#2d3748;}
+.report-doc .meta{text-align:center;font-size:11px;color:#64748b;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #e2e8f0;}
+.report-doc table{width:100%;border-collapse:collapse;margin:8px 0;font-size:11px;}
+.report-doc th{background:#0f2040;color:#fff;padding:6px 8px;text-align:left;}
+.report-doc td{padding:5px 8px;border-bottom:1px solid #e2e8f0;vertical-align:top;}
+.report-doc tr:nth-child(even) td{background:#f7fafc;}
+.report-badge{display:inline-block;border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700;color:#fff;margin-right:4px;}
+.report-actions{display:flex;gap:8px;margin-top:10px;}
+.report-action-btn{flex:1;padding:9px;border-radius:8px;border:1px solid #2d5a7b;background:#1a3050;color:#94a3b8;font-size:12px;cursor:pointer;font-family:inherit;font-weight:600;}
+.report-action-btn:hover{border-color:#00D4AA;color:#00D4AA;}
+
+#modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:300;display:none;align-items:flex-end;justify-content:center;}
+#modal-overlay.show{display:flex;}
+#modal-sheet{background:#0f2040;border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px;max-height:80vh;overflow-y:auto;animation:slideUp .25s ease;border-top:1px solid #2d5a7b;}
+.modal-handle{width:40px;height:4px;background:#2d5a7b;border-radius:2px;margin:0 auto 16px;}
+.modal-title{font-weight:700;font-size:1rem;color:#f1f5f9;margin-bottom:4px;}
+.modal-sub{font-size:12px;color:#94a3b8;margin-bottom:14px;}
+.modal-steps{display:flex;gap:5px;margin-bottom:14px;}
+.modal-step{flex:1;height:3px;border-radius:2px;background:#2d5a7b;}
+.modal-step.done{background:#00D4AA;}
+.modal-expert-card{background:#1a3050;border-radius:10px;padding:14px;display:flex;gap:12px;margin-bottom:16px;border:1px solid #2d5a7b;}
+.confirm-btn{width:100%;background:#00D4AA;color:#0a1628;border:none;border-radius:12px;padding:14px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:12px;font-family:inherit;}
+.fb-btn-row{display:flex;gap:10px;margin-top:4px;}
+.fb-btn{flex:1;padding:14px;border-radius:12px;cursor:pointer;text-align:center;font-weight:700;font-size:.9rem;font-family:inherit;border:1px solid;}
 .issue-chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
-.issue-chip{padding:7px 14px;border-radius:20px;border:1.5px solid var(--gray3);
-  font-size:.82rem;cursor:pointer;transition:.15s;}
-.issue-chip.sel{border-color:var(--red);background:#FFF5F5;color:var(--red);font-weight:600;}
-.modal-confirm-btn{width:100%;background:var(--red);color:#fff;border:none;
-  border-radius:12px;padding:14px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:12px;}
-.modal-close{position:absolute;right:20px;top:20px;background:none;border:none;
-  font-size:1.3rem;cursor:pointer;color:var(--gray5);}
-
-/* ── HISTORY ── */
-.hist-list{padding:12px;}
-.hist-item{background:#fff;border:1px solid var(--gray3);border-radius:var(--radius);
-  padding:12px;margin-bottom:10px;cursor:pointer;transition:.15s;}
-.hist-item:hover{border-color:var(--red);}
-.hist-dis{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
-.hist-dis-badge{background:var(--red);color:#fff;border-radius:6px;padding:2px 8px;font-size:.72rem;}
-.hist-q{font-size:.85rem;font-weight:600;margin-bottom:3px;}
-.hist-date{font-size:.72rem;color:var(--gray5);}
-
-/* ── LOADING ── */
-.typing{display:flex;gap:4px;padding:10px 14px;background:var(--gray1);
-  border-radius:18px;border-bottom-left-radius:4px;align-self:flex-start;}
-.typing span{width:7px;height:7px;border-radius:50%;background:var(--gray5);
-  animation:bounce .9s infinite;}
-.typing span:nth-child(2){animation-delay:.2s;}
-.typing span:nth-child(3){animation-delay:.4s;}
-@keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-6px);}}
-
-/* scrollbar */
-::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-thumb{background:var(--gray3);border-radius:2px;}
-
-.empty-state{text-align:center;padding:40px 20px;color:var(--gray5);}
-.empty-state .icon{font-size:3rem;margin-bottom:12px;}
-.empty-state p{font-size:.88rem;line-height:1.6;}
+.issue-chip{padding:7px 14px;border-radius:20px;font-size:13px;cursor:pointer;border:1px solid #2d5a7b;background:#1a3050;color:#94a3b8;font-family:inherit;}
+.issue-chip.sel{border-color:#00D4AA;background:rgba(0,212,170,.12);color:#00D4AA;font-weight:700;}
 </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="app">
+  <!-- 헤더 -->
+  <div id="header">
+    <div class="hdr-top" style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+      <div class="hdr-logo-icon">🚨</div>
+      <div>
+        <div class="hdr-title">재난톡 <span style="font-weight:400;font-size:.85rem;color:#64748b;">119tok</span></div>
+        <div class="hdr-sub">온톨로지 기반 · 특허·논문·법령 연계</div>
+      </div>
+    </div>
+    <div class="main-tabs">
+      <button class="main-tab active" data-tab="4대재난" onclick="switchMain('4대재난',this)">
+        🏚️ 4대 재난
+        <div class="main-tab-sub">홍수·화재·산사태·지진</div>
+      </button>
+      <button class="main-tab" data-tab="기상재난" onclick="switchMain('기상재난',this)">
+        🌦️ 기상 재난
+        <div class="main-tab-sub">폭염·한파·태풍·황사·집중호우</div>
+      </button>
+    </div>
+  </div>
 
-<script type="text/babel">
-const {useState, useRef, useEffect, useCallback} = React;
+  <!-- 바디 탭 -->
+  <div id="body-tabs">
+    <button class="body-tab active" onclick="switchTab('chat',this)">💬 채팅</button>
+    <button class="body-tab" onclick="switchTab('experts',this)">👷 전문가</button>
+    <button class="body-tab" onclick="switchTab('feedback',this)">📋 피드백</button>
+    <button class="body-tab" onclick="switchTab('history',this)">📁 이력</button>
+    <button class="body-tab" onclick="switchTab('report',this)">📊 보고서</button>
+  </div>
 
-/* ══════════════════════════════════════
-   I18N
-══════════════════════════════════════ */
-const I18N = {
-  ko:{
-    appName:"재난톡",appSub:"119tok",
-    tabChat:"💬 채팅",tabExperts:"👷 전문가",tabFeedback:"📋 피드백",tabHistory:"📁 이력",
-    disasterTypes:["홍수","화재","산사태","지진","폭염","한파","태풍","황사","집중호우"],
-    inputPlaceholder:"재난 상황을 입력하세요...",
-    send:"전송",photo:"📷 사진",voice:"🎙 음성",
-    welcome:"안녕하세요! 재난톡입니다.\n재난 유형을 선택하고 상황을 알려주세요.",
-    loading:"분석 중...",
-    steps:["즉각행동","조치사항","전문가","R&D"],
-    kbPatent:"📋 관련 특허",kbPaper:"📄 관련 논문",kbLaw:"⚖️ 관련 법령",
-    askExpert:"👷 기술사에게 묻기",
-    expertTitle:"전문가 연결",expertClose:"닫기",
-    fbTitle:"상담 피드백",
-    fbStep1:"전문가 확인",fbStep2:"만족도",fbStep3:"미흡 항목",fbStep4:"완료",
-    fbGood:"😊 만족",fbBad:"😞 미흡",
-    fbIssues:["전문성","정보","속도","매칭","기타"],
-    fbConfirm:"제출",fbDone:"피드백 감사합니다!",
-    rndSuggest:"💡 R&D 과제 제안",
-    noHistory:"아직 상담 이력이 없습니다.",
-    available:"상담 가능",
+  <!-- 콘텐츠 -->
+  <div id="content">
+    <!-- 채팅 탭 -->
+    <div id="chat-tab" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+      <div id="dis-btns">
+        <div class="dis-btn-row" id="dis-btn-row"></div>
+      </div>
+      <div id="chat-area"></div>
+      <div id="chat-input-wrap">
+        <div id="plus-popup">
+          <button class="attach-btn" onclick="document.getElementById('file-input').click()">
+            📷 사진
+          </button>
+          <button class="attach-btn" id="voice-btn" onclick="toggleVoice()">
+            🎙 음성
+          </button>
+          <input id="file-input" type="file" accept="image/*" style="display:none"
+            onchange="handlePhoto(event)"/>
+        </div>
+        <div class="input-row">
+          <button id="plus-btn" onclick="togglePlus()">+</button>
+          <textarea id="chat-input" placeholder="재난 상황을 입력하세요..." rows="1"
+            oninput="updateSendBtn()" onkeydown="handleKey(event)"></textarea>
+          <button id="send-btn" onclick="sendMsg()">↑</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 보고서 탭 -->
+    <div id="report-tab" style="display:none;"></div>
+
+    <!-- 전문가 탭 -->
+    <div id="experts-tab" style="display:none;overflow-y:auto;flex:1;padding:12px;"></div>
+
+    <!-- 피드백 탭 -->
+    <div id="feedback-tab" style="display:none;overflow-y:auto;flex:1;padding:12px;"></div>
+
+    <!-- 이력 탭 -->
+    <div id="history-tab" style="display:none;overflow-y:auto;flex:1;padding:12px;"></div>
+  </div>
+</div>
+
+<!-- 전문가 모달 -->
+<div id="modal-overlay" onclick="closeModalOutside(event)">
+  <div id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">👷 전문가 연결</div>
+    <div class="modal-sub" id="modal-sub"></div>
+    <div class="modal-steps" id="modal-steps">
+      <div class="modal-step done"></div>
+      <div class="modal-step"></div>
+      <div class="modal-step"></div>
+      <div class="modal-step"></div>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+// ── 데이터
+var KB = {
+  홍수:{icon:'🌊',col:'#06b6d4',kw:['홍수','침수','하천','범람','제방','배수'],
+    patents:[{id:'P-F01',t:'하천범람 실시간 모니터링',a:'건설기술연구원'},{id:'P-F02',t:'AI 홍수예측 모델링',a:'수자원공사'},{id:'P-F03',t:'도심침수 자동차단 게이트',a:'환경부'}],
+    papers:[{id:'R-F01',t:'도시유역 홍수위험도 평가',j:'수자원학회'},{id:'R-F02',t:'기후변화 극한홍수 빈도',j:'토목학회'},{id:'R-F03',t:'딥러닝 홍수피해 예측',j:'Nat.Hazards'}],
+    laws:[{id:'L-F01',t:'자연재해대책법 제18조',d:'대피명령'},{id:'L-F02',t:'하천법 제46조',d:'홍수예보'},{id:'L-F03',t:'재난안전법 제38조',d:'특별재난지역'}],
+    acts:['즉시 고지대 대피, 지하공간 금지','하천수위 모니터링 및 통제선 설치','응급배수펌프 가동, 모래주머니 차단','이재민 대피소 개설 및 긴급물자 지원'],
   },
-  en:{
-    appName:"DisasterTalk",appSub:"119tok",
-    tabChat:"💬 Chat",tabExperts:"👷 Experts",tabFeedback:"📋 Feedback",tabHistory:"📁 History",
-    disasterTypes:["Flood","Fire","Landslide","Earthquake","Heat Wave","Cold Wave","Typhoon","Yellow Dust","Heavy Rain"],
-    inputPlaceholder:"Describe the disaster situation...",
-    send:"Send",photo:"📷 Photo",voice:"🎙 Voice",
-    welcome:"Hello! I'm DisasterTalk.\nSelect a disaster type and describe the situation.",
-    loading:"Analyzing...",
-    steps:["Immediate Action","Measures","Expert","R&D"],
-    kbPatent:"📋 Patents",kbPaper:"📄 Papers",kbLaw:"⚖️ Laws",
-    askExpert:"👷 Ask Engineer",
-    expertTitle:"Connect Expert",expertClose:"Close",
-    fbTitle:"Consultation Feedback",
-    fbStep1:"Check Expert",fbStep2:"Rating",fbStep3:"Issues",fbStep4:"Done",
-    fbGood:"😊 Satisfied",fbBad:"😞 Unsatisfied",
-    fbIssues:["Expertise","Info","Speed","Matching","Other"],
-    fbConfirm:"Submit",fbDone:"Thank you for your feedback!",
-    rndSuggest:"💡 R&D Proposal",
-    noHistory:"No consultation history yet.",
-    available:"Available",
+  화재:{icon:'🔥',col:'#ef4444',kw:['화재','불','연기','화염','산불'],
+    patents:[{id:'P-FI01',t:'AI 화재감지 스프링클러',a:'소방산업기술원'},{id:'P-FI02',t:'드론 산불감시 자동신고',a:'산림청'},{id:'P-FI03',t:'초고층 화재 구조 에어쿠션',a:'소방청'}],
+    papers:[{id:'R-FI01',t:'산불 확산 모델 시뮬레이션',j:'산림학회'},{id:'R-FI02',t:'고층건물 화재 피난계단',j:'소방안전학회'},{id:'R-FI03',t:'딥러닝 CCTV 화재감지',j:'Fire Safety J.'}],
+    laws:[{id:'L-FI01',t:'소방기본법 제16조',d:'화재진압 조치'},{id:'L-FI02',t:'화재예방법 제12조',d:'위험물 금연'},{id:'L-FI03',t:'건축법 제49조',d:'방화구획 기준'}],
+    acts:['119 신고 후 즉시 대피, 엘리베이터 금지','방화문 닫고 젖은 수건으로 틈새 차단','지하 연기 축적 확인 후 통제','화재조사팀 투입 및 인근 건물 점검'],
   },
-  ja:{
-    appName:"災害トーク",appSub:"119tok",
-    tabChat:"💬 チャット",tabExperts:"👷 専門家",tabFeedback:"📋 フィードバック",tabHistory:"📁 履歴",
-    disasterTypes:["洪水","火災","山崩れ","地震","熱波","寒波","台風","黄砂","集中豪雨"],
-    inputPlaceholder:"災害状況を入力してください...",
-    send:"送信",photo:"📷 写真",voice:"🎙 音声",
-    welcome:"こんにちは！災害トークです。\n災害の種類を選んで状況を教えてください。",
-    loading:"分析中...",
-    steps:["即時行動","措置","専門家","R&D"],
-    kbPatent:"📋 特許",kbPaper:"📄 論文",kbLaw:"⚖️ 法令",
-    askExpert:"👷 技術士に聞く",
-    expertTitle:"専門家接続",expertClose:"閉じる",
-    fbTitle:"相談フィードバック",
-    fbStep1:"専門家確認",fbStep2:"満足度",fbStep3:"不満項目",fbStep4:"完了",
-    fbGood:"😊 満足",fbBad:"😞 不満",
-    fbIssues:["専門性","情報","速度","マッチング","その他"],
-    fbConfirm:"送信",fbDone:"フィードバックありがとう！",
-    rndSuggest:"💡 R&D提案",
-    noHistory:"相談履歴はまだありません。",
-    available:"対応可",
+  산사태:{icon:'⛰️',col:'#f59e0b',kw:['산사태','사면','낙석','토석','균열','붕괴'],
+    patents:[{id:'P-L01',t:'사면붕괴 IoT 센서 네트워크',a:'건설기술연구원'},{id:'P-L02',t:'산사태 토석류 차단 그물망',a:'산림청'},{id:'P-L03',t:'강우기반 사면안전도 평가',a:'국토연구원'}],
+    papers:[{id:'R-L01',t:'강우강도 사면파괴 임계값',j:'토목학회'},{id:'R-L02',t:'딥러닝 위성영상 산사태',j:'Remote Sensing'},{id:'R-L03',t:'토석류 유동해석 수치모델',j:'Landslides J.'}],
+    laws:[{id:'L-L01',t:'자연재해대책법 제19조',d:'산사태 위험지구'},{id:'L-L02',t:'사방사업법 제12조',d:'사방댐 설치'},{id:'L-L03',t:'급경사지법 제7조',d:'붕괴위험지역'}],
+    acts:['경사면 하부 주민 즉시 대피','사방댐 점검 및 토석류 차단 보강','도로 통제 및 낙석 제거 작업투입','사면 계측 센서 상시 모니터링'],
   },
-  zh:{
-    appName:"灾难通",appSub:"119tok",
-    tabChat:"💬 聊天",tabExperts:"👷 专家",tabFeedback:"📋 反馈",tabHistory:"📁 历史",
-    disasterTypes:["洪水","火灾","山体滑坡","地震","热浪","寒潮","台风","沙尘暴","暴雨"],
-    inputPlaceholder:"请描述灾难情况...",
-    send:"发送",photo:"📷 照片",voice:"🎙 语音",
-    welcome:"您好！我是灾难通。\n请选择灾难类型并描述情况。",
-    loading:"分析中...",
-    steps:["即时行动","措施","专家","研发"],
-    kbPatent:"📋 专利",kbPaper:"📄 论文",kbLaw:"⚖️ 法规",
-    askExpert:"👷 咨询工程师",
-    expertTitle:"专家连接",expertClose:"关闭",
-    fbTitle:"咨询反馈",
-    fbStep1:"确认专家",fbStep2:"满意度",fbStep3:"问题项",fbStep4:"完成",
-    fbGood:"😊 满意",fbBad:"😞 不满意",
-    fbIssues:["专业性","信息","速度","匹配","其他"],
-    fbConfirm:"提交",fbDone:"感谢您的反馈！",
-    rndSuggest:"💡 R&D提案",
-    noHistory:"暂无咨询记录。",
-    available:"可咨询",
+  지진:{icon:'⚡',col:'#f97316',kw:['지진','내진','흔들','진도','액상화'],
+    patents:[{id:'P-E01',t:'건물 내진보강 스마트 댐퍼',a:'건설기술연구원'},{id:'P-E02',t:'지진조기경보 P파 감지',a:'기상청'},{id:'P-E03',t:'내진 면진 격리장치',a:'포스코건설'}],
+    papers:[{id:'R-E01',t:'한반도 활성단층 지진위험도',j:'지질학회'},{id:'R-E02',t:'주요 건물 내진성능 평가',j:'지진공학회'},{id:'R-E03',t:'딥러닝 지진파형 분류',j:'Earth Planet.Sci.'}],
+    laws:[{id:'L-E01',t:'지진화산재해대책법 제5조',d:'내진설계 의무'},{id:'L-E02',t:'건축법 제48조',d:'내진구조 기준'},{id:'L-E03',t:'재난안전법 제38조',d:'특별재난지역'}],
+    acts:['테이블 아래 머리 보호, 실내 대기','흔들림 후 가스 차단, 화재 확인','건물 외부 신속 대피, 엘리베이터 금지','여진 대비 지정 대피소 이동'],
   },
-  vi:{
-    appName:"Thảo Luận",appSub:"119tok",
-    tabChat:"💬 Chat",tabExperts:"👷 Chuyên gia",tabFeedback:"📋 Phản hồi",tabHistory:"📁 Lịch sử",
-    disasterTypes:["Lũ lụt","Cháy","Sạt lở","Động đất","Nắng nóng","Giá lạnh","Bão","Bụi vàng","Mưa lớn"],
-    inputPlaceholder:"Mô tả tình huống thiên tai...",
-    send:"Gửi",photo:"📷 Ảnh",voice:"🎙 Giọng",
-    welcome:"Xin chào! Tôi là Thảo Luận 119.\nChọn loại thiên tai và mô tả tình huống.",
-    loading:"Đang phân tích...",
-    steps:["Hành động ngay","Biện pháp","Chuyên gia","R&D"],
-    kbPatent:"📋 Sáng chế",kbPaper:"📄 Bài báo",kbLaw:"⚖️ Pháp luật",
-    askExpert:"👷 Hỏi Kỹ sư",
-    expertTitle:"Kết nối Chuyên gia",expertClose:"Đóng",
-    fbTitle:"Phản hồi tư vấn",
-    fbStep1:"Xem chuyên gia",fbStep2:"Đánh giá",fbStep3:"Vấn đề",fbStep4:"Hoàn thành",
-    fbGood:"😊 Hài lòng",fbBad:"😞 Chưa hài lòng",
-    fbIssues:["Chuyên môn","Thông tin","Tốc độ","Ghép cặp","Khác"],
-    fbConfirm:"Gửi",fbDone:"Cảm ơn phản hồi của bạn!",
-    rndSuggest:"💡 Đề xuất R&D",
-    noHistory:"Chưa có lịch sử tư vấn.",
-    available:"Sẵn sàng",
-  }
+  폭염:{icon:'☀️',col:'#fbbf24',kw:['폭염','더위','열사병','온열'],
+    patents:[{id:'P-H01',t:'도시열섬 쿨링 포그 시스템',a:'서울시'},{id:'P-H02',t:'AI 폭염 취약계층 예측',a:'보건복지부'},{id:'P-H03',t:'폭염저감 옥상녹화',a:'환경산업기술원'}],
+    papers:[{id:'R-H01',t:'한국 폭염 사망률 결정요인',j:'환경보건학회'},{id:'R-H02',t:'도시열섬 녹지 최적배치',j:'조경학회'},{id:'R-H03',t:'기후변화 폭염 빈도 전망',j:'기상학회'}],
+    laws:[{id:'L-H01',t:'재난안전법 제38조',d:'폭염 특보'},{id:'L-H02',t:'산업안전보건법 제39조',d:'야외작업 보호'},{id:'L-H03',t:'보건의료기본법 제36조',d:'온열질환 응급'}],
+    acts:['취약계층 냉방 쉼터 즉시 개방','야외작업 단축 및 그늘막 설치','온열질환자 119 즉시 신고','수분 공급 및 쿨링 포그 가동'],
+  },
+  한파:{icon:'❄️',col:'#60a5fa',kw:['한파','동파','결빙','추위'],
+    patents:[{id:'P-C01',t:'스마트 도로 결빙 제빙',a:'도로공사'},{id:'P-C02',t:'한파 IoT 건강모니터링',a:'보건복지부'},{id:'P-C03',t:'수도 동파방지 열선',a:'수자원공사'}],
+    papers:[{id:'R-C01',t:'한파 취약지역 주거 개선',j:'건축학회'},{id:'R-C02',t:'극한 한파 에너지 빈곤층',j:'공중보건학회'},{id:'R-C03',t:'도로 결빙 예측 모델링',j:'도로학회'}],
+    laws:[{id:'L-C01',t:'재난안전법 제38조',d:'한파 특보'},{id:'L-C02',t:'사회보장기본법 제14조',d:'취약계층 지원'},{id:'L-C03',t:'도로교통법 제21조',d:'결빙 서행'}],
+    acts:['노숙자·독거노인 보호시설 이송','수도 동파 예방 열선 가동','결빙 도로 제설·염화칼슘 살포','에너지 취약계층 난방 지원'],
+  },
+  태풍:{icon:'🌀',col:'#a78bfa',kw:['태풍','강풍','해일','폭풍'],
+    patents:[{id:'P-T01',t:'태풍 경로 AI 예측',a:'기상청'},{id:'P-T02',t:'해안 침수 방벽 자동 거치',a:'해양수산부'},{id:'P-T03',t:'태풍 강풍 피해 감지',a:'국토안전관리원'}],
+    papers:[{id:'R-T01',t:'한반도 태풍 강도 변화',j:'기상학회'},{id:'R-T02',t:'해안 저지대 해일 예측',j:'해양공학회'},{id:'R-T03',t:'태풍 농작물 피해 최소화',j:'농업기상학회'}],
+    laws:[{id:'L-T01',t:'재난안전법 제38조',d:'태풍 특보'},{id:'L-T02',t:'자연재해대책법 제18조',d:'주민 대피'},{id:'L-T03',t:'어촌어항법 제34조',d:'어선 입항'}],
+    acts:['해안가 주민 사전 대피 명령','어선 입항 유도, 어업 활동 금지','간판·시설물 고정, 유리창 보호','침수 취약 지하공간 사전 차단'],
+  },
+  황사:{icon:'🌫️',col:'#d97706',kw:['황사','미세먼지','먼지'],
+    patents:[{id:'P-D01',t:'황사 차단 자동 환기',a:'환경부'},{id:'P-D02',t:'황사 농도 AI 예측',a:'환경과학원'},{id:'P-D03',t:'학교 실내공기질 관리',a:'교육부'}],
+    papers:[{id:'R-D01',t:'황사 발원지 유입 경로',j:'대기환경학회'},{id:'R-D02',t:'황사 노출 호흡기 역학',j:'환경보건학회'},{id:'R-D03',t:'황사 차단 방어림 효과',j:'산림과학회'}],
+    laws:[{id:'L-D01',t:'미세먼지법 제18조',d:'황사 경보'},{id:'L-D02',t:'대기환경보전법 제32조',d:'야외활동 자제'},{id:'L-D03',t:'학교보건법 제12조',d:'휴교 권한'}],
+    acts:['외출 자제 및 KF94 마스크 착용','학교·어린이집 야외수업 금지','창문 밀폐 및 공기청정기 가동','황사 경보 지역 취약계층 보호'],
+  },
+  집중호우:{icon:'🌧️',col:'#3b82f6',kw:['집중호우','호우','폭우','돌발홍수'],
+    patents:[{id:'P-R01',t:'돌발홍수 예경보 시스템',a:'환경부'},{id:'P-R02',t:'지하차도 침수 자동차단',a:'서울시'},{id:'P-R03',t:'강우 레이더 AI 탐지',a:'기상청'}],
+    papers:[{id:'R-R01',t:'돌발홍수 임계강우량',j:'수자원학회'},{id:'R-R02',t:'도심 내수침수 원인',j:'토목학회'},{id:'R-R03',t:'집중호우 신속 복구',j:'방재학회'}],
+    laws:[{id:'L-R01',t:'자연재해대책법 제18조',d:'대피명령'},{id:'L-R02',t:'하천법 제46조',d:'홍수예보'},{id:'L-R03',t:'도로법 제68조',d:'침수 통행제한'}],
+    acts:['저지대·지하공간 즉시 대피','지하차도·지하주차장 진입 차단','하천 수위 상승 상시 모니터링','하수도 역류 지역 모래주머니 배치'],
+  },
 };
 
-/* ══════════════════════════════════════
-   EXPERT DB (20명)
-══════════════════════════════════════ */
-const EXPERTS = [
-  {id:"E01",name:"김수해",spec:"수자원·홍수제어",disasters:["홍수","집중호우"],area:"서울",exp:22,phone:"010-1001-0001"},
-  {id:"E02",name:"이방재",spec:"재난안전·위기관리",disasters:["홍수","태풍","폭염"],area:"부산",exp:18,phone:"010-1001-0002"},
-  {id:"E03",name:"박화재",spec:"소방·화재안전",disasters:["화재"],area:"대구",exp:25,phone:"010-1001-0003"},
-  {id:"E04",name:"최사면",spec:"사면·지반안정",disasters:["산사태"],area:"대전",exp:20,phone:"010-1001-0004"},
-  {id:"E05",name:"정지진",spec:"구조·내진설계",disasters:["지진"],area:"광주",exp:17,phone:"010-1001-0005"},
-  {id:"E06",name:"강기후",spec:"기후변화·폭염대응",disasters:["폭염","한파"],area:"서울",exp:15,phone:"010-1001-0006"},
-  {id:"E07",name:"윤태풍",spec:"바람·해양재해",disasters:["태풍","집중호우"],area:"제주",exp:19,phone:"010-1001-0007"},
-  {id:"E08",name:"임황사",spec:"대기·황사저감",disasters:["황사"],area:"인천",exp:14,phone:"010-1001-0008"},
-  {id:"E09",name:"한호우",spec:"도시침수·배수",disasters:["집중호우","홍수"],area:"수원",exp:21,phone:"010-1001-0009"},
-  {id:"E10",name:"서내진",spec:"지진·구조물피해",disasters:["지진","산사태"],area:"울산",exp:16,phone:"010-1001-0010"},
-  {id:"E11",name:"오산불",spec:"산림화재·산불",disasters:["화재"],area:"춘천",exp:23,phone:"010-1001-0011"},
-  {id:"E12",name:"송댐안",spec:"댐·저수지안전",disasters:["홍수","태풍"],area:"청주",exp:27,phone:"010-1001-0012"},
-  {id:"E13",name:"배열섬",spec:"폭염·도시열섬",disasters:["폭염"],area:"서울",exp:13,phone:"010-1001-0013"},
-  {id:"E14",name:"조동상",spec:"한파·동파예방",disasters:["한파"],area:"평창",exp:12,phone:"010-1001-0014"},
-  {id:"E15",name:"권산피",spec:"산사태·토석류",disasters:["산사태"],area:"강릉",exp:18,phone:"010-1001-0015"},
-  {id:"E16",name:"신연기",spec:"화재·연기제어",disasters:["화재"],area:"창원",exp:20,phone:"010-1001-0016"},
-  {id:"E17",name:"문내수",spec:"내수침수·펌프장",disasters:["집중호우","홍수"],area:"부천",exp:16,phone:"010-1001-0017"},
-  {id:"E18",name:"황지반",spec:"지반·액상화",disasters:["지진","홍수"],area:"포항",exp:24,phone:"010-1001-0018"},
-  {id:"E19",name:"류기상",spec:"기상예측·레이더",disasters:["태풍","폭염","황사"],area:"수원",exp:19,phone:"010-1001-0019"},
-  {id:"E20",name:"안통합",spec:"재난통합관리",disasters:["홍수","화재","산사태","지진"],area:"세종",exp:30,phone:"010-1001-0020"},
+var EXPERTS = [
+  {id:'E01',n:'김수해',s:'수자원·홍수',cats:['홍수','집중호우'],area:'서울',exp:22},
+  {id:'E02',n:'이방재',s:'재난안전',cats:['홍수','태풍','폭염'],area:'부산',exp:18},
+  {id:'E03',n:'박화재',s:'소방·화재',cats:['화재'],area:'대구',exp:25},
+  {id:'E04',n:'최사면',s:'사면·지반',cats:['산사태'],area:'대전',exp:20},
+  {id:'E05',n:'정지진',s:'구조·내진',cats:['지진'],area:'광주',exp:17},
+  {id:'E06',n:'강기후',s:'기후·폭염',cats:['폭염','한파'],area:'서울',exp:15},
+  {id:'E07',n:'윤태풍',s:'바람·해양',cats:['태풍','집중호우'],area:'제주',exp:19},
+  {id:'E08',n:'임황사',s:'대기·황사',cats:['황사'],area:'인천',exp:14},
+  {id:'E09',n:'한호우',s:'도시침수',cats:['집중호우','홍수'],area:'수원',exp:21},
+  {id:'E10',n:'서내진',s:'지진피해',cats:['지진','산사태'],area:'울산',exp:16},
+  {id:'E11',n:'오산불',s:'산림화재',cats:['화재'],area:'춘천',exp:23},
+  {id:'E12',n:'송댐안',s:'댐·저수지',cats:['홍수','태풍'],area:'청주',exp:27},
+  {id:'E13',n:'배열섬',s:'폭염열섬',cats:['폭염'],area:'서울',exp:13},
+  {id:'E14',n:'조동상',s:'한파동파',cats:['한파'],area:'평창',exp:12},
+  {id:'E15',n:'권산피',s:'토석류',cats:['산사태'],area:'강릉',exp:18},
+  {id:'E16',n:'신연기',s:'연기제어',cats:['화재'],area:'창원',exp:20},
+  {id:'E17',n:'문내수',s:'내수침수',cats:['집중호우','홍수'],area:'부천',exp:16},
+  {id:'E18',n:'황지반',s:'지반액상',cats:['지진','홍수'],area:'포항',exp:24},
+  {id:'E19',n:'류기상',s:'기상예측',cats:['태풍','폭염','황사'],area:'수원',exp:19},
+  {id:'E20',n:'안통합',s:'재난통합',cats:['홍수','화재','산사태','지진'],area:'세종',exp:30},
 ];
 
-/* ══════════════════════════════════════
-   ONTOLOGY KB (4대 + 기상재난)
-══════════════════════════════════════ */
-const KB = {
-  홍수:{
-    patents:[
-      {id:"P-F01",title:"하천범람 실시간 모니터링 시스템",applicant:"한국건설기술연구원"},
-      {id:"P-F02",title:"AI기반 홍수예측 모델링 장치",applicant:"수자원공사"},
-      {id:"P-F03",title:"도심침수 자동차단 게이트",applicant:"환경부산하기관"},
-      {id:"P-F04",title:"스마트 배수펌프 제어시스템",applicant:"K-water"},
-      {id:"P-F05",title:"홍수피해 빠른 복구 모듈형 제방",applicant:"현대건설"},
-      {id:"P-F06",title:"강우레이더 기반 침수지도 생성",applicant:"기상청"},
-      {id:"P-F07",title:"드론 활용 수해지역 탐지",applicant:"국토연구원"},
-      {id:"P-F08",title:"홍수시 긴급구조 부유체",applicant:"소방방재청"},
-      {id:"P-F09",title:"지하공간 침수방지 자동방벽",applicant:"서울시"},
-      {id:"P-F10",title:"하수도 역류방지 인공지능 밸브",applicant:"환경공단"},
-    ],
-    papers:[
-      {id:"R-F01",title:"도시유역 홍수위험도 평가 방법론",journal:"한국수자원학회논문집"},
-      {id:"R-F02",title:"기후변화에 따른 극한홍수 빈도 분석",journal:"대한토목학회논문집"},
-      {id:"R-F03",title:"딥러닝 기반 홍수피해면적 예측",journal:"Nat. Hazards"},
-      {id:"R-F04",title:"홍수취약지구 주민대피 최적화 연구",journal:"방재학회논문집"},
-      {id:"R-F05",title:"홍수 후 토양오염 복원 기술",journal:"환경공학연구"},
-      {id:"R-F06",title:"실시간 레이더 강우자료 홍수예보 활용",journal:"기상학회지"},
-      {id:"R-F07",title:"스마트시티 홍수관리 플랫폼 설계",journal:"Smart Cities J."},
-    ],
-    laws:[
-      {id:"L-F01",title:"자연재해대책법 제18조",desc:"대피명령 권한"},
-      {id:"L-F02",title:"하천법 제46조",desc:"홍수예보 및 대피"},
-      {id:"L-F03",title:"재난안전법 제38조",desc:"특별재난지역 선포"},
-      {id:"L-F04",title:"도시침수방지법 제12조",desc:"침수위험지구 관리"},
-      {id:"L-F05",title:"기상법 제16조",desc:"기상특보 발령"},
-      {id:"L-F06",title:"소방기본법 제49조",desc:"인명구조 우선"},
-      {id:"L-F07",title:"자연재해대책법 제60조",desc:"복구비용 지원"},
-      {id:"L-F08",title:"국토계획법 제37조",desc:"침수위험구역 지정"},
-      {id:"L-F09",title:"도로법 제68조",desc:"재해시 통행제한"},
-    ],
-    actions:[
-      "즉시 고지대로 대피하세요. 지하공간 진입을 금지합니다.",
-      "한강·낙동강 수위 실시간 모니터링 후 통제선 설치",
-      "응급배수펌프 가동 및 모래주머니로 침수 차단",
-      "이재민 대피소 개설 및 긴급물자 지원"
-    ],
-    measures:[
-      {text:"위험구역 통제선 설치",law:"자연재해대책법 제18조"},
-      {text:"하천수위 경보 발령",law:"하천법 제46조"},
-      {text:"저지대 주민 긴급 대피",law:"재난안전법 제38조"},
-      {text:"지하주차장 차량 이동 명령",law:"도시침수방지법 제12조"},
-    ]
-  },
-  화재:{
-    patents:[
-      {id:"P-FI01",title:"AI 화재감지 스프링클러 연동 시스템",applicant:"한국소방산업기술원"},
-      {id:"P-FI02",title:"드론 산불감시 자동신고 장치",applicant:"산림청"},
-      {id:"P-FI03",title:"다층건물 연기확산 차단 방화벽",applicant:"방재연구원"},
-      {id:"P-FI04",title:"초고층 화재 구조용 에어쿠션",applicant:"소방청"},
-      {id:"P-FI05",title:"전기차 배터리 화재진압 폼 시스템",applicant:"한국화학연구원"},
-      {id:"P-FI06",title:"화학공장 가스누출 화재차단 밸브",applicant:"산업안전공단"},
-      {id:"P-FI07",title:"화재 후 건물 붕괴위험 AI 예측",applicant:"국토안전관리원"},
-      {id:"P-FI08",title:"지하철 화재 대피 유도 시스템",applicant:"서울교통공사"},
-      {id:"P-FI09",title:"산불 진화 무인헬기 시스템",applicant:"산림항공관리소"},
-      {id:"P-FI10",title:"화재 연기흡입 방지 개인보호장구",applicant:"안전보건공단"},
-    ],
-    papers:[
-      {id:"R-FI01",title:"산불 확산 모델 시뮬레이션 연구",journal:"산림학회지"},
-      {id:"R-FI02",title:"고층건물 화재 피난계단 용량 분석",journal:"소방안전학회"},
-      {id:"R-FI03",title:"딥러닝 CCTV 화재조기감지 정확도",journal:"Fire Safety J."},
-      {id:"R-FI04",title:"화재피해 복원 최적 공법 비교",journal:"대한건축학회"},
-      {id:"R-FI05",title:"터널화재 시뮬레이션 및 대피유도",journal:"한국터널학회"},
-      {id:"R-FI06",title:"전통목조건물 화재방지 시스템",journal:"문화재학회"},
-      {id:"R-FI07",title:"IoT 연기센서 네트워크 최적 배치",journal:"한국통신학회논문지"},
-    ],
-    laws:[
-      {id:"L-FI01",title:"소방기본법 제16조",desc:"화재진압 우선 조치"},
-      {id:"L-FI02",title:"화재예방법 제12조",desc:"위험물 시설 금연"},
-      {id:"L-FI03",title:"재난안전법 제14조",desc:"긴급구조 지휘체계"},
-      {id:"L-FI04",title:"건축법 제49조",desc:"방화구획 설치 기준"},
-      {id:"L-FI05",title:"소방시설법 제9조",desc:"스프링클러 의무화"},
-      {id:"L-FI06",title:"산림보호법 제34조",desc:"산불예방 입산통제"},
-      {id:"L-FI07",title:"소방기본법 제20조",desc:"소방차 통행로 확보"},
-      {id:"L-FI08",title:"화재조사법 제5조",desc:"화인 조사 의무"},
-      {id:"L-FI09",title:"재난안전법 제60조",desc:"피해보상 지원"},
-    ],
-    actions:[
-      "119 신고 후 즉시 대피, 엘리베이터 사용 금지",
-      "방화문 닫고 젖은 수건으로 틈새 막기",
-      "지하·실내 연기 축적 확인 후 통제",
-      "화재조사팀 투입 및 인근 건물 예방 점검"
-    ],
-    measures:[
-      {text:"초기 진화 및 대피 유도",law:"소방기본법 제16조"},
-      {text:"위험구역 접근통제",law:"재난안전법 제14조"},
-      {text:"방화구획 점검",law:"건축법 제49조"},
-      {text:"피해주민 임시주거 지원",law:"재난안전법 제60조"},
-    ]
-  },
-  산사태:{
-    patents:[
-      {id:"P-L01",title:"사면붕괴 예측 IoT 센서 네트워크",applicant:"한국건설기술연구원"},
-      {id:"P-L02",title:"산사태 토석류 차단 그물망 시스템",applicant:"산림청"},
-      {id:"P-L03",title:"강우기반 사면안전도 자동평가 장치",applicant:"국토연구원"},
-      {id:"P-L04",title:"급경사지 붕괴 경보 알림 시스템",applicant:"행정안전부"},
-      {id:"P-L05",title:"산사태 복구용 고강도 옹벽 모듈",applicant:"현대엔지니어링"},
-      {id:"P-L06",title:"드론 토석류 경로 실시간 추적",applicant:"소방방재청"},
-      {id:"P-L07",title:"사면 녹화 생태공학 복원 시스템",applicant:"한국환경산업기술원"},
-      {id:"P-L08",title:"인공신경망 기반 산사태 취약지 예측",applicant:"지질연구원"},
-      {id:"P-L09",title:"사면 변위 실시간 계측 경보 장치",applicant:"한국도로공사"},
-      {id:"P-L10",title:"폭우시 사면 안정화 배수공 시스템",applicant:"환경부"},
-    ],
-    papers:[
-      {id:"R-L01",title:"강우강도에 따른 사면파괴 임계값 분석",journal:"대한토목학회"},
-      {id:"R-L02",title:"딥러닝 위성영상 산사태 탐지",journal:"Remote Sensing"},
-      {id:"R-L03",title:"토석류 유동해석 수치모델",journal:"Landslides J."},
-      {id:"R-L04",title:"산사태 취약지 주민 리스크 인식 연구",journal:"방재학회논문집"},
-      {id:"R-L05",title:"산사태 복구 경사면 안정화 공법",journal:"한국지반공학회"},
-      {id:"R-L06",title:"태풍 동반 호우 산사태 발생 패턴",journal:"기상학회지"},
-      {id:"R-L07",title:"급경사지 관리체계 개선 방안 연구",journal:"국토연구"},
-    ],
-    laws:[
-      {id:"L-L01",title:"자연재해대책법 제19조",desc:"산사태 위험지구 관리"},
-      {id:"L-L02",title:"사방사업법 제12조",desc:"사방댐 설치 기준"},
-      {id:"L-L03",title:"산지관리법 제38조",desc:"산지전용 허가 기준"},
-      {id:"L-L04",title:"급경사지법 제7조",desc:"붕괴위험지역 지정"},
-      {id:"L-L05",title:"재난안전법 제38조",desc:"특별재난지역 선포"},
-      {id:"L-L06",title:"도로법 제68조",desc:"재해시 통행제한"},
-      {id:"L-L07",title:"자연재해대책법 제60조",desc:"피해복구 지원"},
-      {id:"L-L08",title:"건축법 제21조",desc:"비탈면 안전기준"},
-      {id:"L-L09",title:"재난안전법 제34조",desc:"주민대피령 발령"},
-    ],
-    actions:[
-      "경사면 하부·골짜기 주민 즉시 대피",
-      "사방댐 점검 및 토석류 차단 그물망 긴급 보강",
-      "도로 통제 및 낙석 제거 작업대 투입",
-      "사면 계측 센서 상시 모니터링 체계 구축"
-    ],
-    measures:[
-      {text:"위험사면 하부 주민 대피",law:"자연재해대책법 제19조"},
-      {text:"사방댐 긴급 점검",law:"사방사업법 제12조"},
-      {text:"도로·교통 통제",law:"도로법 제68조"},
-      {text:"복구 지원 신청",law:"자연재해대책법 제60조"},
-    ]
-  },
-  지진:{
-    patents:[
-      {id:"P-E01",title:"건물 내진보강 스마트 댐퍼 시스템",applicant:"한국건설기술연구원"},
-      {id:"P-E02",title:"지진조기경보 P파 감지 장치",applicant:"기상청"},
-      {id:"P-E03",title:"내진 면진 격리장치 성능개선 기술",applicant:"포스코건설"},
-      {id:"P-E04",title:"지진 후 구조물 피해도 AI 평가",applicant:"국토안전관리원"},
-      {id:"P-E05",title:"액상화 방지 지반 개량 공법",applicant:"한국지반공학회"},
-      {id:"P-E06",title:"지진 발생시 가스 자동차단 시스템",applicant:"한국가스공사"},
-      {id:"P-E07",title:"고층건물 지진 모니터링 센서 플랫폼",applicant:"롯데건설"},
-      {id:"P-E08",title:"지진재난 대응 긴급통신 시스템",applicant:"KT"},
-      {id:"P-E09",title:"도심지 지하매설물 지진피해 예측",applicant:"한국시설안전공단"},
-      {id:"P-E10",title:"소규모 건물 경량 내진보강 키트",applicant:"중소건설연구원"},
-    ],
-    papers:[
-      {id:"R-E01",title:"한반도 활성단층 분포와 지진위험도",journal:"대한지질학회지"},
-      {id:"R-E02",title:"주요 건물 내진성능 평가 방법론",journal:"한국지진공학회"},
-      {id:"R-E03",title:"지진조기경보 전달 최적 경로 연구",journal:"정보통신학회"},
-      {id:"R-E04",title:"포항지진 액상화 피해 사례 분석",journal:"한국지반공학회논문집"},
-      {id:"R-E05",title:"지진 후 심리적 외상 대응 연구",journal:"정신건강연구"},
-      {id:"R-E06",title:"딥러닝 지진파형 분류 및 예측",journal:"Earth Planet. Sci."},
-      {id:"R-E07",title:"도시 지진취약지구 복구 우선순위 결정",journal:"방재학회논문집"},
-    ],
-    laws:[
-      {id:"L-E01",title:"지진·화산재해대책법 제5조",desc:"내진설계 의무화"},
-      {id:"L-E02",title:"건축법 제48조",desc:"내진구조 기준"},
-      {id:"L-E03",title:"재난안전법 제38조",desc:"특별재난지역 선포"},
-      {id:"L-E04",title:"가스안전법 제44조",desc:"가스시설 긴급차단"},
-      {id:"L-E05",title:"도시가스사업법 제29조",desc:"공급시설 안전점검"},
-      {id:"L-E06",title:"소방기본법 제16조",desc:"긴급구조 우선"},
-      {id:"L-E07",title:"시설물안전법 제18조",desc:"시설물 정밀점검"},
-      {id:"L-E08",title:"재난안전법 제34조",desc:"주민대피 명령"},
-      {id:"L-E09",title:"지진재해법 제28조",desc:"피해복구 지원"},
-    ],
-    actions:[
-      "지진 감지 즉시 테이블 아래 머리 보호, 실내 대기",
-      "흔들림 멈춘 후 가스 차단, 화재 여부 확인",
-      "건물 외부로 신속 대피, 엘리베이터 사용 금지",
-      "여진 대비 지정 대피소 이동 및 구조신호"
-    ],
-    measures:[
-      {text:"가스·전기 차단",law:"가스안전법 제44조"},
-      {text:"건물 안전진단",law:"시설물안전법 제18조"},
-      {text:"주민대피 명령",law:"재난안전법 제34조"},
-      {text:"특별재난지역 신청",law:"재난안전법 제38조"},
-    ]
-  },
-  폭염:{
-    patents:[
-      {id:"P-H01",title:"도시 열섬 냉각 스마트 쿨링 포그 시스템",applicant:"서울시기술연구원"},
-      {id:"P-H02",title:"AI 취약계층 폭염위험도 실시간 예측",applicant:"보건복지부"},
-      {id:"P-H03",title:"폭염저감 건물 옥상녹화 시스템",applicant:"한국환경산업기술원"},
-    ],
-    papers:[
-      {id:"R-H01",title:"한국 폭염 사망률 결정요인 분석",journal:"환경보건학회지"},
-      {id:"R-H02",title:"도시열섬 완화 녹지 최적배치 연구",journal:"한국조경학회"},
-      {id:"R-H03",title:"기후변화 폭염 강도·빈도 전망",journal:"기상학회지"},
-    ],
-    laws:[
-      {id:"L-H01",title:"재난안전법 제38조",desc:"폭염 특보 대응"},
-      {id:"L-H02",title:"산업안전보건법 제39조",desc:"야외작업 폭염 보호"},
-      {id:"L-H03",title:"보건의료기본법 제36조",desc:"온열질환 응급대응"},
-    ],
-    actions:[
-      "취약계층 냉방 쉼터 즉시 개방",
-      "야외작업 시간 단축 및 그늘막 설치",
-      "온열질환자 발생 시 119 즉시 신고",
-      "수분 공급 및 쿨링 포그 시스템 가동"
-    ],
-    measures:[
-      {text:"무더위 쉼터 개방",law:"재난안전법 제38조"},
-      {text:"야외작업 통제",law:"산업안전보건법 제39조"},
-      {text:"온열환자 응급처치",law:"보건의료기본법 제36조"},
-    ]
-  },
-  한파:{
-    patents:[
-      {id:"P-C01",title:"스마트 도로 결빙 감지·제빙 시스템",applicant:"한국도로공사"},
-      {id:"P-C02",title:"취약계층 한파대응 IoT 건강모니터링",applicant:"보건복지부"},
-      {id:"P-C03",title:"수도 동파방지 자동 열선 제어장치",applicant:"한국수자원공사"},
-    ],
-    papers:[
-      {id:"R-C01",title:"한파 취약지역 주거환경 개선 연구",journal:"대한건축학회논문집"},
-      {id:"R-C02",title:"극한 한파 에너지 빈곤층 건강피해",journal:"공중보건학회지"},
-      {id:"R-C03",title:"도로 결빙 예측 모델링 기술",journal:"한국도로학회논문집"},
-    ],
-    laws:[
-      {id:"L-C01",title:"재난안전법 제38조",desc:"한파 특보 대응"},
-      {id:"L-C02",title:"사회보장기본법 제14조",desc:"취약계층 지원"},
-      {id:"L-C03",title:"도로교통법 제21조",desc:"결빙도로 서행 의무"},
-    ],
-    actions:[
-      "노숙자·독거노인 긴급 보호시설 이송",
-      "수도 동파 예방 열선 가동 및 보온재 설치",
-      "결빙 도로 제설·염화칼슘 살포",
-      "에너지 취약계층 난방 지원 긴급 연결"
-    ],
-    measures:[
-      {text:"취약계층 한파 긴급 지원",law:"사회보장기본법 제14조"},
-      {text:"결빙도로 제설 작업",law:"도로교통법 제21조"},
-      {text:"한파쉼터 긴급 개방",law:"재난안전법 제38조"},
-    ]
-  },
-  태풍:{
-    patents:[
-      {id:"P-T01",title:"태풍 경로 AI 예측 및 피해영향 평가",applicant:"기상청"},
-      {id:"P-T02",title:"해안 침수 방벽 자동 거치 시스템",applicant:"해양수산부"},
-      {id:"P-T03",title:"태풍 강풍 구조물 피해 실시간 감지",applicant:"국토안전관리원"},
-    ],
-    papers:[
-      {id:"R-T01",title:"한반도 태풍 강도 변화 추세 분석",journal:"기상학회지"},
-      {id:"R-T02",title:"해안 저지대 태풍 해일 피해 예측",journal:"해양공학회논문집"},
-      {id:"R-T03",title:"태풍 대비 농작물 피해 최소화 연구",journal:"농업기상학회"},
-    ],
-    laws:[
-      {id:"L-T01",title:"재난안전법 제38조",desc:"태풍 특보 대응"},
-      {id:"L-T02",title:"자연재해대책법 제18조",desc:"주민 사전 대피"},
-      {id:"L-T03",title:"어촌어항법 제34조",desc:"어선 입항 명령"},
-    ],
-    actions:[
-      "해안가·저지대 주민 사전 대피 명령",
-      "어선 입항 유도 및 어업 활동 금지",
-      "간판·시설물 고정 및 유리창 보호",
-      "침수 취약 지하공간 사전 차단"
-    ],
-    measures:[
-      {text:"주민 사전 대피",law:"자연재해대책법 제18조"},
-      {text:"어선 입항 명령",law:"어촌어항법 제34조"},
-      {text:"태풍 특보 발령",law:"재난안전법 제38조"},
-    ]
-  },
-  황사:{
-    patents:[
-      {id:"P-D01",title:"황사 미세먼지 자동 차단 환기시스템",applicant:"환경부"},
-      {id:"P-D02",title:"황사 농도 예측 AI 딥러닝 모델",applicant:"국립환경과학원"},
-      {id:"P-D03",title:"황사 취약학교 실내공기질 관리 장치",applicant:"교육부"},
-    ],
-    papers:[
-      {id:"R-D01",title:"황사 발원지별 한국 유입 경로 분석",journal:"대기환경학회지"},
-      {id:"R-D02",title:"황사 노출 호흡기 질환 역학 연구",journal:"환경보건학회지"},
-      {id:"R-D03",title:"황사 차단 식물 방어림 조성 효과",journal:"산림과학회지"},
-    ],
-    laws:[
-      {id:"L-D01",title:"미세먼지법 제18조",desc:"황사 경보 발령"},
-      {id:"L-D02",title:"대기환경보전법 제32조",desc:"야외활동 자제 권고"},
-      {id:"L-D03",title:"학교보건법 제12조",desc:"휴교·단축수업 권한"},
-    ],
-    actions:[
-      "외출 자제 및 마스크(KF94) 착용 필수",
-      "학교·어린이집 휴원 또는 야외수업 금지",
-      "창문 밀폐 및 공기청정기 가동",
-      "황사 경보 지역 취약계층 보호 조치"
-    ],
-    measures:[
-      {text:"황사 경보 발령",law:"미세먼지법 제18조"},
-      {text:"야외활동 자제 권고",law:"대기환경보전법 제32조"},
-      {text:"학교 휴교 검토",law:"학교보건법 제12조"},
-    ]
-  },
-  집중호우:{
-    patents:[
-      {id:"P-R01",title:"집중호우 돌발홍수 예경보 시스템",applicant:"환경부"},
-      {id:"P-R02",title:"도심 지하차도 침수 자동차단 게이트",applicant:"서울시"},
-      {id:"P-R03",title:"강우 레이더 AI 돌발기상 탐지",applicant:"기상청"},
-    ],
-    papers:[
-      {id:"R-R01",title:"집중호우 돌발홍수 발생 임계강우량",journal:"한국수자원학회"},
-      {id:"R-R02",title:"도심지 내수침수 복합원인 분석",journal:"대한토목학회"},
-      {id:"R-R03",title:"집중호우 피해 신속 복구 절차 연구",journal:"방재학회논문집"},
-    ],
-    laws:[
-      {id:"L-R01",title:"자연재해대책법 제18조",desc:"대피명령 발령"},
-      {id:"L-R02",title:"하천법 제46조",desc:"홍수예보 체계"},
-      {id:"L-R03",title:"도로법 제68조",desc:"침수도로 통행제한"},
-    ],
-    actions:[
-      "저지대·지하공간 즉시 대피",
-      "지하차도·지하주차장 진입 차단",
-      "하천 급격한 수위 상승 모니터링",
-      "하수도 역류 지역 모래주머니 배치"
-    ],
-    measures:[
-      {text:"저지대 대피 명령",law:"자연재해대책법 제18조"},
-      {text:"침수도로 통행 차단",law:"도로법 제68조"},
-      {text:"홍수예보 발령",law:"하천법 제46조"},
-    ]
-  }
-};
+// ── 상태
+var currentMain = '4대재난';
+var currentTab  = 'chat';
+var busy        = false;
+var modalDis    = '';
+var modalItem   = null;
+var modalStep   = 1;
+var modalRating = '';
+var modalIssues = [];
 
-/* helper */
-function timeStr(){
-  const d=new Date();
-  return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+function tnow(){var d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');}
+function cats(){return currentMain==='4대재난'?['홍수','화재','산사태','지진']:['폭염','한파','태풍','황사','집중호우'];}
+function detect(t){var c=cats();for(var i=0;i<c.length;i++){var kb=KB[c[i]];if(kb.kw.some(function(w){return t.includes(w);}))return c[i];}return null;}
+function getSaved(key){try{return JSON.parse(localStorage.getItem(key)||'[]');}catch(e){return[];}}
+function save(key,arr){try{localStorage.setItem(key,JSON.stringify(arr));}catch(e){}}
+
+// ── 전환
+function switchMain(name, el){
+  currentMain=name;
+  document.querySelectorAll('.main-tab').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  switchTab('chat', document.querySelectorAll('.body-tab')[0]);
+  renderDisBtns();
+  renderChat();
 }
 
-/* ══════════════════════════════════════
-   COMPONENTS
-══════════════════════════════════════ */
-
-/* Accordion for KB */
-function KBAccordion({t, kb, onAsk}){
-  const [open,setOpen]=useState({pat:false,pap:false,law:false});
-  const tog=k=>setOpen(p=>({...p,[k]:!p[k]}));
-  return(
-    <div className="kb-section">
-      {/* Patents */}
-      <div className="kb-toggle" onClick={()=>tog('pat')}>
-        <span>{t.kbPatent} ({kb.patents.length})</span><span>{open.pat?'▲':'▼'}</span>
-      </div>
-      <div className={`kb-body${open.pat?' open':''}`}>
-        {kb.patents.map(p=>(
-          <div className="kb-item" key={p.id}>
-            <div>
-              <div style={{fontWeight:600}}>{p.title}</div>
-              <div style={{fontSize:'.72rem',color:'var(--gray5)'}}>{p.applicant}</div>
-            </div>
-            <button className="ask-btn" onClick={()=>onAsk(p)}>{t.askExpert}</button>
-          </div>
-        ))}
-      </div>
-      {/* Papers */}
-      <div className="kb-toggle" style={{marginTop:6}} onClick={()=>tog('pap')}>
-        <span>{t.kbPaper} ({kb.papers.length})</span><span>{open.pap?'▲':'▼'}</span>
-      </div>
-      <div className={`kb-body${open.pap?' open':''}`}>
-        {kb.papers.map(p=>(
-          <div className="kb-item" key={p.id}>
-            <div>
-              <div style={{fontWeight:600}}>{p.title}</div>
-              <div style={{fontSize:'.72rem',color:'var(--gray5)'}}>{p.journal}</div>
-            </div>
-            <button className="ask-btn" onClick={()=>onAsk(p)}>{t.askExpert}</button>
-          </div>
-        ))}
-      </div>
-      {/* Laws */}
-      <div className="kb-toggle" style={{marginTop:6}} onClick={()=>tog('law')}>
-        <span>{t.kbLaw} ({kb.laws.length})</span><span>{open.law?'▲':'▼'}</span>
-      </div>
-      <div className={`kb-body${open.law?' open':''}`}>
-        {kb.laws.map(l=>(
-          <div className="kb-item" key={l.id}>
-            <div>
-              <div style={{fontWeight:600}}>{l.title}</div>
-              <div style={{fontSize:'.72rem',color:'var(--gray5)'}}>{l.desc}</div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
+function switchTab(name, el){
+  currentTab=name;
+  document.querySelectorAll('.body-tab').forEach(function(b){b.classList.remove('active');});
+  el.classList.add('active');
+  var tabs=['chat','experts','feedback','history','report'];
+  tabs.forEach(function(t){
+    var el2=document.getElementById(t+'-tab');
+    if(el2) el2.style.display=t===name?(t==='chat'?'flex':'block'):'none';
+  });
+  if(name==='experts')renderExperts();
+  if(name==='feedback')renderFeedback();
+  if(name==='history')renderHistory();
+  if(name==='report')renderReport();
 }
 
-/* Expert connect modal */
-function ExpertModal({t, disaster, item, onClose, onFeedbackSaved}){
-  const [step,setStep]=useState(1);
-  const [rating,setRating]=useState(null);
-  const [issues,setIssues]=useState([]);
-  const candidates=EXPERTS.filter(e=>e.disasters.includes(disaster)).slice(0,3);
-  const expert=candidates[0]||EXPERTS[0];
-
-  function toggleIssue(i){
-    setIssues(p=>p.includes(i)?p.filter(x=>x!==i):[...p,i]);
-  }
-  function submitFeedback(){
-    const fb={
-      id:'FB-'+Date.now(),
-      disaster,
-      expertId:expert.id,
-      expertName:expert.name,
-      item:item?.title||'',
-      rating,
-      issues,
-      rnd: rating==='bad'&&issues.includes('정보')||issues.includes('information')||issues.includes('情報'),
-      date:new Date().toLocaleDateString('ko-KR'),
-    };
-    try{
-      const prev=JSON.parse(localStorage.getItem('fbDB')||'[]');
-      localStorage.setItem('fbDB',JSON.stringify([fb,...prev]));
-    }catch(e){}
-    onFeedbackSaved(fb);
-    setStep(4);
-  }
-
-  return(
-    <div className="modal-overlay" onClick={e=>e.target.className==='modal-overlay'&&onClose()}>
-      <div className="modal-sheet">
-        <div className="modal-handle"/>
-        <div className="modal-title">{t.expertTitle}</div>
-        <div className="modal-sub">{disaster} · {item?.title}</div>
-        {/* step indicator */}
-        <div className="step-indicator">
-          {[1,2,3,4].map(s=>(
-            <div key={s} className={`step-dot${step>=s?' done':''}`}/>
-          ))}
-        </div>
-
-        {step===1&&(
-          <div>
-            <div className="modal-expert-card">
-              <div className="expert-avatar">{expert.name[0]}</div>
-              <div className="expert-info">
-                <div className="expert-name">{expert.name} {t.available} ✅</div>
-                <div className="expert-spec">{expert.spec}</div>
-                <div style={{fontSize:'.75rem',color:'var(--gray5)',marginTop:4}}>
-                  {expert.area} · 경력 {expert.exp}년 · {expert.id}
-                </div>
-                <div className="expert-tags">
-                  {expert.disasters.map(d=>(
-                    <span key={d} className="expert-tag">{d}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <button className="modal-confirm-btn" onClick={()=>setStep(2)}>상담 연결 →</button>
-          </div>
-        )}
-
-        {step===2&&(
-          <div>
-            <div style={{fontWeight:700,marginBottom:12}}>{t.fbTitle}</div>
-            <div className="fb-btn-row">
-              <div className={`fb-btn good${rating==='good'?' sel':''}`} onClick={()=>{setRating('good');setStep(4);submitFeedback();}}>
-                {t.fbGood}
-              </div>
-              <div className={`fb-btn bad${rating==='bad'?' sel':''}`} onClick={()=>{setRating('bad');setStep(3);}}>
-                {t.fbBad}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {step===3&&(
-          <div>
-            <div style={{fontWeight:700,marginBottom:8}}>미흡한 부분을 선택하세요</div>
-            <div className="issue-chips">
-              {t.fbIssues.map(i=>(
-                <div key={i} className={`issue-chip${issues.includes(i)?' sel':''}`}
-                  onClick={()=>toggleIssue(i)}>{i}</div>
-              ))}
-            </div>
-            <button className="modal-confirm-btn" onClick={submitFeedback}>{t.fbConfirm}</button>
-          </div>
-        )}
-
-        {step===4&&(
-          <div style={{textAlign:'center',padding:'20px 0'}}>
-            <div style={{fontSize:'2.5rem',marginBottom:12}}>✅</div>
-            <div style={{fontWeight:700,fontSize:'1rem',marginBottom:8}}>{t.fbDone}</div>
-            {rating==='bad'&&issues.length>0&&(
-              <div className="rnd-badge">{t.rndSuggest}: {disaster} 분야</div>
-            )}
-            <button className="modal-confirm-btn" style={{marginTop:16}} onClick={onClose}>
-              {t.expertClose}
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+// ── 재난 버튼
+function renderDisBtns(){
+  var row=document.getElementById('dis-btn-row');
+  row.innerHTML='';
+  cats().forEach(function(cat){
+    var kb=KB[cat];
+    var btn=document.createElement('button');
+    btn.className='dis-btn';
+    btn.style.borderColor=kb.col+'44';
+    btn.innerHTML='<div class="dis-btn-icon">'+kb.icon+'</div><div class="dis-btn-label" style="color:'+kb.col+'">'+cat+'</div>';
+    btn.onclick=function(){sendMsg('현장에서 '+cat+' 상황이 발생했습니다. 대응 방법을 알려주세요.');};
+    row.appendChild(btn);
+  });
 }
 
-/* ══════════════════════════════════════
-   MAIN APP
-══════════════════════════════════════ */
-function App(){
-  const [lang,setLang]=useState('ko');
-  const [disaster,setDisaster]=useState('홍수');
-  const [tab,setTab]=useState('chat');
-  const [messages,setMessages]=useState([]);
-  const [input,setInput]=useState('');
-  const [loading,setLoading]=useState(false);
-  const [modal,setModal]=useState(null); // {item, disaster}
-  const [feedbacks,setFeedbacks]=useState([]);
-  const [history,setHistory]=useState([]);
-  const chatRef=useRef(null);
+// ── 채팅
+var messages=[];
 
-  const t=I18N[lang];
+function renderChat(){
+  messages=[{role:'bot',text:'안녕하세요! 재난톡 AI입니다 🚨\n\n재난 상황을 텍스트·사진·음성으로 알려주세요.\n특허·논문·법령 DB를 참조하여 분석합니다.',time:tnow()}];
+  renderMessages();
+}
 
-  // 초기 웰컴 메시지
-  useEffect(()=>{
-    setMessages([{role:'bot',text:t.welcome,time:timeStr()}]);
-  },[lang]);
-
-  // 피드백 로드
-  useEffect(()=>{
-    try{
-      const fb=JSON.parse(localStorage.getItem('fbDB')||'[]');
-      setFeedbacks(fb);
-    }catch(e){}
-  },[]);
-
-  // 스크롤
-  useEffect(()=>{
-    if(chatRef.current) chatRef.current.scrollTop=chatRef.current.scrollHeight;
-  },[messages,loading]);
-
-  const CLAUDE_API='https://api.anthropic.com/v1/messages';
-
-  async function sendMessage(){
-    if(!input.trim()||loading) return;
-    const userMsg={role:'user',text:input,time:timeStr()};
-    setMessages(p=>[...p,userMsg]);
-    setInput('');
-    setLoading(true);
-
-    const kb=KB[disaster]||KB['홍수'];
-    const patentList=kb.patents.map(p=>`[${p.id}] ${p.title} (${p.applicant})`).join('\n');
-    const paperList=kb.papers.map(p=>`[${p.id}] ${p.title} - ${p.journal}`).join('\n');
-    const lawList=kb.laws.map(l=>`[${l.id}] ${l.title}: ${l.desc}`).join('\n');
-
-    const system=`당신은 재난 대응 전문 AI입니다. 재난 유형: ${disaster}
-응답 언어: ${lang==='ko'?'한국어':lang==='en'?'English':lang==='ja'?'日本語':lang==='zh'?'中文':'Tiếng Việt'}
-
-지식 DB (출처 명시 필수):
-=특허=
-${patentList}
-=논문=
-${paperList}
-=법령=
-${lawList}
-
-응답 형식 (반드시 준수):
-##ACTION: 즉각 행동 1~2문장
-##MEASURE: 조치사항 (법령 출처 포함) 2~3개
-##EXPERT: 추천 전문가 분야
-##RND: R&D 필요 여부와 방향`;
-
-    try{
-      const res=await fetch(CLAUDE_API,{
-        method:'POST',
-        headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
-        body:JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:1000,
-          system,
-          messages:[{role:'user',content:input}]
-        })
-      });
-      const data=await res.json();
-      const text=data.content?.[0]?.text||'응답을 받지 못했습니다.';
-      const botMsg={role:'bot',text,time:timeStr(),isResult:true,disaster,kb};
-      setMessages(p=>[...p,botMsg]);
-      // 이력 저장
-      const hi={id:'H-'+Date.now(),disaster,question:input,date:new Date().toLocaleDateString('ko-KR'),answer:text};
-      setHistory(p=>[hi,...p]);
-    }catch(e){
-      setMessages(p=>[...p,{role:'bot',text:'API 연결 오류. API Key를 확인하세요.',time:timeStr()}]);
+function renderMessages(){
+  var area=document.getElementById('chat-area');
+  area.innerHTML='';
+  messages.forEach(function(m){
+    if(m.isResult){
+      var div=document.createElement('div');
+      div.className='msg bot';
+      div.style.animation='fadeIn .2s ease';
+      div.appendChild(buildResultCard(m));
+      var t=document.createElement('div');
+      t.className='msg-time';t.textContent=m.time;
+      div.appendChild(t);
+      area.appendChild(div);
+    } else {
+      var div=document.createElement('div');
+      div.className='msg '+m.role;
+      div.style.animation='fadeIn .2s ease';
+      if(m.imgUrl){var img=document.createElement('img');img.src=m.imgUrl;img.style.cssText='width:100%;max-height:130px;object-fit:cover;border-radius:14px;';div.appendChild(img);}
+      var b=document.createElement('div');b.className='bubble';b.textContent=m.text;div.appendChild(b);
+      var t=document.createElement('div');t.className='msg-time';t.textContent=m.time;div.appendChild(t);
+      area.appendChild(div);
     }
-    setLoading(false);
-  }
-
-  function onAsk(item){
-    setModal({item,disaster});
-  }
-
-  function onFeedbackSaved(fb){
-    setFeedbacks(p=>[fb,...p]);
-  }
-
-  /* render result bubble */
-  function ResultBubble({msg}){
-    const kb=msg.kb||KB[msg.disaster]||KB['홍수'];
-    const lines=msg.text.split('\n');
-    const sections={ACTION:[],MEASURE:[],EXPERT:[],RND:[]};
-    let cur=null;
-    lines.forEach(l=>{
-      if(l.startsWith('##ACTION')) cur='ACTION';
-      else if(l.startsWith('##MEASURE')) cur='MEASURE';
-      else if(l.startsWith('##EXPERT')) cur='EXPERT';
-      else if(l.startsWith('##RND')) cur='RND';
-      else if(cur&&l.trim()) sections[cur].push(l.trim());
+  });
+  // 예시 (첫화면)
+  if(messages.length===1&&!busy){
+    var label=document.createElement('div');label.className='example-label';label.textContent='💬 예시 (클릭하면 온톨로지 분석)';
+    area.appendChild(label);
+    cats().forEach(function(cat){
+      var kb=KB[cat];
+      var btn=document.createElement('button');
+      btn.className='example-btn';
+      btn.innerHTML='<span style="font-size:18px">'+kb.icon+'</span><div><div class="example-cat" style="color:'+kb.col+'">'+cat+'</div><div class="example-desc">현장에서 '+cat+' 상황이 발생했습니다.</div></div>';
+      btn.onclick=function(){sendMsg('현장에서 '+cat+' 상황이 발생했습니다. 대응 방법을 알려주세요.');};
+      area.appendChild(btn);
     });
-
-    const hasStruct=Object.values(sections).some(v=>v.length>0);
-
-    return(
-      <div className="result-card">
-        <h4>🚨 {msg.disaster} 대응 분석</h4>
-        {hasStruct?(
-          <>
-            {sections.ACTION.length>0&&(
-              <div className="step-row">
-                <div className="step-badge">{t.steps[0]}</div>
-                <div className="step-text">{sections.ACTION.join(' ')}</div>
-              </div>
-            )}
-            {sections.MEASURE.length>0&&(
-              <div className="step-row">
-                <div className="step-badge" style={{background:'var(--blue)'}}>{t.steps[1]}</div>
-                <div className="step-text">
-                  {sections.MEASURE.map((m,i)=>(
-                    <div key={i}>{m}</div>
-                  ))}
-                </div>
-              </div>
-            )}
-            {sections.EXPERT.length>0&&(
-              <div className="step-row">
-                <div className="step-badge" style={{background:'var(--teal)'}}>{t.steps[2]}</div>
-                <div className="step-text">{sections.EXPERT.join(' ')}</div>
-              </div>
-            )}
-            {sections.RND.length>0&&(
-              <div className="step-row">
-                <div className="step-badge" style={{background:'var(--orange)'}}>{t.steps[3]}</div>
-                <div className="step-text">{sections.RND.join(' ')}</div>
-              </div>
-            )}
-          </>
-        ):(
-          <div style={{fontSize:'.85rem',lineHeight:1.6,whiteSpace:'pre-wrap'}}>{msg.text}</div>
-        )}
-        <KBAccordion t={t} kb={kb} onAsk={onAsk}/>
-      </div>
-    );
   }
-
-  return(
-    <>
-      {/* HEADER */}
-      <div className="hdr">
-        <div className="hdr-top">
-          <div className="hdr-logo">🚨 {t.appName}<span>{t.appSub}</span></div>
-          <div className="hdr-actions">
-            <select className="lang-sel" value={lang} onChange={e=>setLang(e.target.value)}>
-              <option value="ko">🇰🇷 한국어</option>
-              <option value="en">🇺🇸 English</option>
-              <option value="ja">🇯🇵 日本語</option>
-              <option value="zh">🇨🇳 中文</option>
-              <option value="vi">🇻🇳 Tiếng Việt</option>
-            </select>
-          </div>
-        </div>
-        <div className="dis-tabs">
-          {t.disasterTypes.map((d,i)=>{
-            const keys=Object.keys(KB);
-            const key=keys[i]||keys[0];
-            return(
-              <div key={d} className={`dis-tab${disaster===key?' active':''}`}
-                onClick={()=>setDisaster(key)}>{d}</div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* BODY TABS */}
-      <div className="body-tabs">
-        {['chat','experts','feedback','history'].map((k,i)=>(
-          <div key={k} className={`body-tab${tab===k?' active':''}`} onClick={()=>setTab(k)}>
-            {[t.tabChat,t.tabExperts,t.tabFeedback,t.tabHistory][i]}
-          </div>
-        ))}
-      </div>
-
-      {/* CHAT TAB */}
-      {tab==='chat'&&(
-        <>
-          <div className="chat-area" ref={chatRef}>
-            {messages.map((m,i)=>(
-              <div key={i} className={`msg ${m.role}`}>
-                {m.isResult?(
-                  <ResultBubble msg={m}/>
-                ):(
-                  <div className="msg-bubble"
-                    style={{whiteSpace:'pre-wrap'}}>{m.text}</div>
-                )}
-                <div className="msg-time">{m.time}</div>
-              </div>
-            ))}
-            {loading&&(
-              <div className="typing">
-                <span/><span/><span/>
-              </div>
-            )}
-          </div>
-          <div className="chat-input-wrap">
-            <div className="attach-row">
-              <button className="attach-btn">📷 사진</button>
-              <button className="attach-btn">🎙 음성</button>
-              <button className="attach-btn" style={{background:'#EBF8FF',color:'var(--blue)',borderColor:'#BEE3F8'}}>
-                {disaster} 선택됨
-              </button>
-            </div>
-            <div className="input-row">
-              <textarea className="chat-input" rows={1}
-                placeholder={t.inputPlaceholder}
-                value={input}
-                onChange={e=>setInput(e.target.value)}
-                onKeyDown={e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();}}}
-              />
-              <button className="send-btn" onClick={sendMessage} disabled={loading||!input.trim()}>
-                ➤
-              </button>
-            </div>
-          </div>
-        </>
-      )}
-
-      {/* EXPERTS TAB */}
-      {tab==='experts'&&(
-        <div className="expert-grid" style={{overflowY:'auto',flex:1}}>
-          <div style={{fontSize:'.8rem',color:'var(--gray5)',marginBottom:10}}>
-            {disaster} 관련 전문가 {EXPERTS.filter(e=>e.disasters.includes(disaster)).length}명 · 전체 {EXPERTS.length}명
-          </div>
-          {EXPERTS.filter(e=>e.disasters.includes(disaster)).map(e=>(
-            <div key={e.id} className="expert-card" onClick={()=>setModal({item:null,disaster})}>
-              <div className="expert-avatar">{e.name[0]}</div>
-              <div className="expert-info">
-                <div className="expert-name">{e.name} <span className="expert-avail">✅ {t.available}</span></div>
-                <div className="expert-spec">{e.spec}</div>
-                <div style={{fontSize:'.75rem',color:'var(--gray5)'}}>{e.area} · {e.exp}년</div>
-                <div className="expert-tags">
-                  {e.disasters.map(d=>(
-                    <span key={d} className="expert-tag">{d}</span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          ))}
-          {EXPERTS.filter(e=>!e.disasters.includes(disaster)).length>0&&(
-            <>
-              <div style={{fontSize:'.78rem',color:'var(--gray5)',margin:'12px 0 8px',fontWeight:600}}>
-                기타 전문가
-              </div>
-              {EXPERTS.filter(e=>!e.disasters.includes(disaster)).map(e=>(
-                <div key={e.id} className="expert-card" style={{opacity:.7}} onClick={()=>setModal({item:null,disaster})}>
-                  <div className="expert-avatar" style={{background:'linear-gradient(135deg,var(--gray5),var(--gray7))'}}>{e.name[0]}</div>
-                  <div className="expert-info">
-                    <div className="expert-name">{e.name}</div>
-                    <div className="expert-spec">{e.spec}</div>
-                    <div style={{fontSize:'.75rem',color:'var(--gray5)'}}>{e.area} · {e.exp}년</div>
-                  </div>
-                </div>
-              ))}
-            </>
-          )}
-        </div>
-      )}
-
-      {/* FEEDBACK TAB */}
-      {tab==='feedback'&&(
-        <div className="fb-list" style={{overflowY:'auto',flex:1}}>
-          {feedbacks.length===0?(
-            <div className="empty-state">
-              <div className="icon">📋</div>
-              <p>아직 피드백이 없습니다.<br/>채팅에서 전문가 상담 후<br/>피드백을 남겨보세요.</p>
-            </div>
-          ):feedbacks.map(fb=>(
-            <div key={fb.id} className="fb-item">
-              <div className="fb-header">
-                <span style={{fontSize:'.82rem',fontWeight:700}}>{fb.expertName} ({fb.expertId})</span>
-                <span style={{fontSize:'.75rem',color:'var(--gray5)'}}>{fb.date}</span>
-              </div>
-              <div style={{fontSize:'.78rem',marginBottom:6}}>
-                <span style={{background:'var(--red)',color:'#fff',borderRadius:4,padding:'1px 7px',fontSize:'.7rem'}}>{fb.disaster}</span>
-                {' '}{fb.item}
-              </div>
-              <div className="fb-score">
-                {[1,2,3,4,5].map(s=>(
-                  <div key={s} className={`score-dot${fb.rating==='good'&&s<=5?' filled':fb.rating==='bad'&&s<=2?' filled':''}`}/>
-                ))}
-                <span style={{fontSize:'.75rem',marginLeft:6,color:'var(--gray7)'}}>
-                  {fb.rating==='good'?'😊 만족':'😞 미흡'}
-                </span>
-              </div>
-              {fb.issues&&fb.issues.length>0&&(
-                <div style={{fontSize:'.75rem',color:'var(--gray5)',marginTop:4}}>
-                  미흡: {fb.issues.join(', ')}
-                </div>
-              )}
-              {fb.rnd&&(
-                <div className="rnd-badge">{t.rndSuggest}: {fb.disaster}</div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* HISTORY TAB */}
-      {tab==='history'&&(
-        <div className="hist-list" style={{overflowY:'auto',flex:1}}>
-          {history.length===0?(
-            <div className="empty-state">
-              <div className="icon">📁</div>
-              <p>{t.noHistory}</p>
-            </div>
-          ):history.map(h=>(
-            <div key={h.id} className="hist-item" onClick={()=>{
-              setDisaster(h.disaster);setTab('chat');
-              setMessages(p=>[...p,
-                {role:'user',text:h.question,time:timeStr()},
-                {role:'bot',text:h.answer,time:timeStr(),isResult:true,disaster:h.disaster,kb:KB[h.disaster]||KB['홍수']}
-              ]);
-            }}>
-              <div className="hist-dis">
-                <span className="hist-dis-badge">{h.disaster}</span>
-              </div>
-              <div className="hist-q">{h.question}</div>
-              <div className="hist-date">{h.date}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* MODAL */}
-      {modal&&(
-        <ExpertModal
-          t={t}
-          disaster={modal.disaster}
-          item={modal.item}
-          onClose={()=>setModal(null)}
-          onFeedbackSaved={onFeedbackSaved}
-        />
-      )}
-    </>
-  );
+  if(busy){
+    var t=document.createElement('div');t.className='typing';
+    for(var i=0;i<3;i++){var s=document.createElement('span');s.style.animationDelay=(i*200)+'ms';t.appendChild(s);}
+    area.appendChild(t);
+  }
+  area.scrollTop=area.scrollHeight;
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+function buildResultCard(m){
+  var kb=m.kb||KB[m.dis]||KB['홍수'];
+  var col=KB[m.dis]?KB[m.dis].col:'#00D4AA';
+
+  // AI 응답 파싱
+  var lines=m.text.split('\n');
+  var sec={A:[],M:[],E:[],R:[]};var cur=null;
+  lines.forEach(function(l){
+    if(l.startsWith('##ACTION'))cur='A';
+    else if(l.startsWith('##MEASURE'))cur='M';
+    else if(l.startsWith('##EXPERT'))cur='E';
+    else if(l.startsWith('##RND'))cur='R';
+    else if(cur&&l.trim())sec[cur].push(l.trim());
+  });
+
+  // 카드
+  var card=document.createElement('div');
+  card.className='result-card';
+  card.style.borderLeft='3px solid '+col;
+
+  // 제목 + 학습 레벨 뱃지
+  var titleRow=document.createElement('div');
+  titleRow.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;';
+  var title=document.createElement('div');
+  title.className='result-title';title.style.color=col;
+  title.textContent='🚨 '+m.dis+' 대응 분석';
+  titleRow.appendChild(title);
+  if(m.stats){
+    var lvBadge=document.createElement('div');
+    lvBadge.style.cssText='font-size:10px;background:#1a3050;border:1px solid #2d5a7b;border-radius:10px;padding:2px 8px;color:#00D4AA;';
+    lvBadge.textContent='🧠 Lv.'+m.stats.evolveLevel+' 진화중';
+    titleRow.appendChild(lvBadge);
+  }
+  card.appendChild(titleRow);
+
+  // 5단계 탭 정의
+  var tabDefs=[
+    {key:'act',  icon:'⚡', label:'행동',   color:'#ff4757'},
+    {key:'mea',  icon:'🔧', label:'조치',   color:'#3b82f6'},
+    {key:'know', icon:'📚', label:'전문지식',color:'#a78bfa'},
+    {key:'exp',  icon:'👷', label:'전문가', color:'#00D4AA'},
+    {key:'rnd',  icon:'🔬', label:'R&D',   color:'#f97316'},
+  ];
+
+  var tabHeader=document.createElement('div');
+  tabHeader.className='step-tabs';
+  var panelWrap=document.createElement('div');
+
+  tabDefs.forEach(function(td, i){
+    // 탭 버튼
+    var btn=document.createElement('button');
+    btn.className='step-tab'+(i===0?' active':'');
+    btn.style.background=i===0?td.color+'22':'';
+    btn.style.color=i===0?td.color:'';
+    btn.innerHTML='<span class="step-tab-icon">'+td.icon+'</span>'+td.label;
+    btn.onclick=(function(idx){
+      return function(){
+        tabHeader.querySelectorAll('.step-tab').forEach(function(b,j){
+          b.classList.toggle('active',j===idx);
+          b.style.background=j===idx?tabDefs[j].color+'22':'';
+          b.style.color=j===idx?tabDefs[j].color:'';
+        });
+        panelWrap.querySelectorAll('.step-panel').forEach(function(p,j){
+          p.classList.toggle('active',j===idx);
+        });
+      };
+    })(i);
+    tabHeader.appendChild(btn);
+
+    // 패널
+    var panel=document.createElement('div');
+    panel.className='step-panel'+(i===0?' active':'');
+
+    /* ── 행동 탭 ── */
+    if(td.key==='act'){
+      var acts=kb.acts||[];
+      acts.forEach(function(a,idx){
+        var item=document.createElement('div');item.className='step-item';
+        var num=document.createElement('div');num.className='step-num';
+        num.style.cssText='background:'+td.color+';color:#fff';num.textContent=idx+1;
+        var txt=document.createElement('div');txt.textContent=a;
+        item.appendChild(num);item.appendChild(txt);panel.appendChild(item);
+      });
+      if(sec.A.length){
+        var box=document.createElement('div');box.className='ai-box';
+        box.innerHTML='<span style="color:'+td.color+';font-weight:700">🤖 AI 행동 요령</span><br>'+sec.A.join('<br>');
+        panel.appendChild(box);
+      }
+    }
+
+    /* ── 조치 탭 ── */
+    else if(td.key==='mea'){
+      kb.laws.forEach(function(l,idx){
+        var item=document.createElement('div');item.className='step-item';
+        var num=document.createElement('div');num.className='step-num';
+        num.style.cssText='background:'+td.color+';color:#fff';num.textContent=idx+1;
+        var txt=document.createElement('div');
+        txt.innerHTML=l.d+'<br><span class="law-pill">⚖️ '+l.t+'</span>';
+        item.appendChild(num);item.appendChild(txt);panel.appendChild(item);
+      });
+      if(sec.M.length){
+        var box=document.createElement('div');box.className='ai-box';
+        box.innerHTML='<span style="color:'+td.color+';font-weight:700">🤖 AI 조치 안내</span><br>'+sec.M.join('<br>');
+        panel.appendChild(box);
+      }
+    }
+
+    /* ── 전문지식 탭 ── */
+    else if(td.key==='know'){
+      panel.appendChild(buildKB(kb, m.dis));
+    }
+
+    /* ── 전문가 탭 ── */
+    else if(td.key==='exp'){
+      var expList=EXPERTS.filter(function(e){return e.cats.includes(m.dis);}).slice(0,3);
+      if(!expList.length)expList=EXPERTS.slice(0,2);
+      expList.forEach(function(e){
+        var item=document.createElement('div');item.className='step-item';item.style.alignItems='center';
+        var av=document.createElement('div');
+        av.style.cssText='width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#0891b2,#00D4AA);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;flex-shrink:0;';
+        av.textContent=e.n[0];
+        var info=document.createElement('div');info.style.flex='1';
+        info.innerHTML='<div style="font-weight:700;font-size:12px;color:#f1f5f9">'+e.n+' <span style="font-size:10px;color:#00c875">✅</span></div>'
+          +'<div style="font-size:11px;color:#00D4AA">'+e.s+'</div>'
+          +'<div style="font-size:11px;color:#64748b">'+e.area+' · '+e.exp+'년</div>';
+        var askBtn=document.createElement('button');askBtn.className='ask-btn';askBtn.textContent='연결';
+        (function(ex){askBtn.onclick=function(){openModal(m.dis,null);};})(e);
+        item.appendChild(av);item.appendChild(info);item.appendChild(askBtn);
+        panel.appendChild(item);
+      });
+      // 피드백 안내
+      var hint=document.createElement('div');
+      hint.style.cssText='margin-top:8px;font-size:11px;color:#64748b;text-align:center;';
+      hint.textContent='상담 후 미흡한 부분은 R&D 탭에서 등록하세요 →';
+      panel.appendChild(hint);
+    }
+
+    /* ── R&D 탭 ── */
+    else if(td.key==='rnd'){
+      var issues=['전문성 부족','관련 정보 부족','대응 속도 미흡','전문가 매칭 미흡','기술 표준 부재','기타'];
+      var checked=[];
+      var doneDiv=document.createElement('div');doneDiv.style.display='none';
+      doneDiv.className='rnd-done';
+      doneDiv.textContent='✅ R&D 과제로 등록되었습니다. NTB 연계 예정';
+
+      var label=document.createElement('div');
+      label.style.cssText='font-size:12px;color:#94a3b8;margin-bottom:8px;';
+      label.textContent='미흡한 부분을 선택하면 R&D 과제로 자동 등록됩니다';
+      panel.appendChild(label);
+
+      issues.forEach(function(iss){
+        var row=document.createElement('div');row.className='rnd-issue';
+        var chk=document.createElement('div');chk.className='rnd-check';chk.textContent='';
+        var lbl=document.createElement('div');lbl.style.cssText='font-size:12px;color:#f1f5f9;';lbl.textContent=iss;
+        row.onclick=function(){
+          var idx=checked.indexOf(iss);
+          if(idx>-1){checked.splice(idx,1);chk.classList.remove('sel');chk.textContent='';}
+          else{checked.push(iss);chk.classList.add('sel');chk.textContent='✓';}
+        };
+        row.appendChild(chk);row.appendChild(lbl);panel.appendChild(row);
+      });
+
+      var submitBtn=document.createElement('button');
+      submitBtn.className='rnd-submit';
+      submitBtn.textContent='💡 R&D 과제 등록';
+      submitBtn.onclick=function(){
+        if(!checked.length){alert('미흡한 부분을 선택하세요.');return;}
+        // 저장
+        var rndList=getSaved('rndDB');
+        rndList.unshift({id:'RND'+Date.now(),disaster:m.dis,issues:checked.slice(),date:new Date().toLocaleDateString('ko-KR')});
+        save('rndDB',rndList);
+        submitBtn.style.display='none';
+        doneDiv.style.display='block';
+      };
+      panel.appendChild(submitBtn);
+      panel.appendChild(doneDiv);
+
+      // 현장 지식 직접 추가 (KB 진화)
+      var kbSection=document.createElement('div');
+      kbSection.style.cssText='margin-top:14px;border-top:1px solid #1e3a5f;padding-top:12px;';
+      kbSection.innerHTML='<div style="font-size:12px;font-weight:700;color:#a78bfa;margin-bottom:8px;">📝 현장 지식 추가 (KB 직접 진화)</div>';
+      var kbInput=document.createElement('textarea');
+      kbInput.placeholder='현장에서 경험한 유용한 지식을 입력하면 다음 AI 분석에 반영됩니다...';
+      kbInput.style.cssText='width:100%;background:#1a3050;border:1px solid #2d5a7b;border-radius:8px;padding:8px 12px;font-size:12px;font-family:inherit;resize:none;outline:none;color:#f1f5f9;height:64px;margin-bottom:6px;';
+      var kbBtn=document.createElement('button');
+      kbBtn.style.cssText='width:100%;background:#a78bfa22;border:1px solid #a78bfa44;border-radius:8px;padding:8px;font-size:12px;font-weight:700;color:#a78bfa;cursor:pointer;font-family:inherit;';
+      kbBtn.textContent='📚 KB에 추가 (학습 반영)';
+      var kbDone=document.createElement('div');
+      kbDone.style.cssText='display:none;font-size:11px;color:#00D4AA;text-align:center;margin-top:4px;';
+      kbDone.textContent='✅ 저장됨. 다음 분석부터 반영됩니다.';
+      kbBtn.onclick=(function(dis){
+        return function(){
+          var txt=kbInput.value.trim();
+          if(!txt)return;
+          var userKB=getSaved('userKB');
+          userKB.unshift({id:'KB'+Date.now(),dis:dis,content:txt,date:new Date().toLocaleDateString('ko-KR')});
+          save('userKB',userKB);
+          kbInput.value='';kbDone.style.display='block';
+          setTimeout(function(){kbDone.style.display='none';},3000);
+        };
+      })(m.dis);
+      kbSection.appendChild(kbInput);kbSection.appendChild(kbBtn);kbSection.appendChild(kbDone);
+      panel.appendChild(kbSection);
+
+      // AI R&D 제안
+      if(sec.R.length){
+        var box=document.createElement('div');box.className='ai-box';box.style.marginTop='10px';
+        box.innerHTML='<span style="color:'+td.color+';font-weight:700">🤖 AI R&D 제안</span><br>'+sec.R.join('<br>');
+        panel.appendChild(box);
+      }
+    }
+
+    panelWrap.appendChild(panel);
+  });
+
+  card.appendChild(tabHeader);
+  card.appendChild(panelWrap);
+  return card;
+}
+
+function buildKB(kb, dis){
+  var wrap=document.createElement('div');wrap.style.marginTop='8px';
+  var sections=[['📋 관련 특허',kb.patents,'a','t'],['📄 관련 논문',kb.papers,'j','t'],['⚖️ 관련 법령',kb.laws,'d','t']];
+  sections.forEach(function(s, si){
+    var body=document.createElement('div');body.className='kb-body';
+    var toggle=document.createElement('div');toggle.className='kb-toggle';
+    toggle.innerHTML=s[0]+' ('+s[1].length+')<span>▼</span>';
+    toggle.onclick=function(){body.classList.toggle('open');toggle.querySelector('span').textContent=body.classList.contains('open')?'▲':'▼';};
+    s[1].forEach(function(item){
+      var row=document.createElement('div');row.className='kb-row';
+      var info=document.createElement('div');info.className='kb-row-info';
+      info.innerHTML='<div>'+item.t+'</div><div>'+(item[s[2]]||'')+'</div>';
+      row.appendChild(info);
+      if(si<2){
+        var btn=document.createElement('button');btn.className='ask-btn';btn.textContent='👷 기술사';
+        (function(it){btn.onclick=function(){openModal(dis,it);};})(item);
+        row.appendChild(btn);
+      }
+      body.appendChild(row);
+    });
+    wrap.appendChild(toggle);wrap.appendChild(body);
+  });
+  return wrap;
+}
+
+/* ══════════════════════════════════════
+   학습 시스템 (Learning Engine)
+   사고→분석→피드백→R&D→KB 진화
+══════════════════════════════════════ */
+
+// 학습 데이터 요약 — system prompt에 주입
+function buildLearningContext(dis){
+  var ctx='';
+
+  // 1. 피드백 DB — 미흡 패턴 학습
+  var fbs=getSaved('fbDB').filter(function(f){return f.disaster===dis;});
+  if(fbs.length){
+    var issueCount={};
+    fbs.forEach(function(f){
+      if(f.issues)f.issues.forEach(function(i){issueCount[i]=(issueCount[i]||0)+1;});
+    });
+    var topIssues=Object.entries(issueCount).sort(function(a,b){return b[1]-a[1];}).slice(0,3);
+    if(topIssues.length){
+      ctx+='\n[학습된 미흡 패턴] ';
+      ctx+=topIssues.map(function(i){return i[0]+'('+i[1]+'건)';}).join(', ');
+      ctx+=' → 이 부분을 보완하여 답변하세요.';
+    }
+    var badCount=fbs.filter(function(f){return f.rating==='bad';}).length;
+    var goodCount=fbs.filter(function(f){return f.rating==='good';}).length;
+    ctx+='\n[누적 만족도] 만족 '+goodCount+'건 / 미흡 '+badCount+'건';
+  }
+
+  // 2. R&D DB — 미해결 과제 반영
+  var rnds=getSaved('rndDB').filter(function(r){return r.disaster===dis;});
+  if(rnds.length){
+    var rndIssues=[];
+    rnds.forEach(function(r){if(r.issues)rndIssues=rndIssues.concat(r.issues);});
+    var unique=[...new Set(rndIssues)];
+    ctx+='\n[미해결 R&D 과제] '+unique.join(', ')+' → 관련 최신 연구·기술을 우선 언급하세요.';
+  }
+
+  // 3. 상담 이력 — 반복 이슈 패턴
+  var hist=getSaved('histDB').filter(function(h){return h.disaster===dis;});
+  if(hist.length>=3){
+    ctx+='\n[반복 상담 이슈] 이 재난유형으로 '+hist.length+'건 누적. 자주 묻는 상황에 대해 더 구체적으로 답변하세요.';
+  }
+
+  // 4. 사용자 학습 KB — 직접 추가된 지식
+  var userKB=getSaved('userKB').filter(function(k){return k.dis===dis;});
+  if(userKB.length){
+    ctx+='\n[현장 전문가 추가 지식]\n';
+    userKB.forEach(function(k){ctx+='- '+k.content+'\n';});
+  }
+
+  return ctx;
+}
+
+// 학습 통계 반환
+function getLearningStats(){
+  var fbs=getSaved('fbDB');
+  var rnds=getSaved('rndDB');
+  var hist=getSaved('histDB');
+  var userKB=getSaved('userKB');
+  return {
+    totalConsult: hist.length,
+    totalFeedback: fbs.length,
+    satisfactionRate: fbs.length ? Math.round(fbs.filter(function(f){return f.rating==='good';}).length/fbs.length*100) : 0,
+    rndCount: rnds.length,
+    userKBCount: userKB.length,
+    evolveLevel: Math.floor((fbs.length+rnds.length*2+userKB.length*3)/10)+1,
+  };
+}
+
+async function sendMsg(pretext){
+  var t=(pretext||document.getElementById('chat-input').value).trim();
+  if(!t||busy)return;
+  messages.push({role:'user',text:t,time:tnow()});
+  document.getElementById('chat-input').value='';
+  updateSendBtn();busy=true;renderMessages();
+
+  var dis=detect(t)||cats()[0];
+  var kb=KB[dis];
+
+  // 이력 저장
+  var hist=getSaved('histDB');
+  hist.unshift({id:'H'+Date.now(),disaster:dis,question:t,date:new Date().toLocaleDateString('ko-KR')});
+  if(hist.length>200)hist=hist.slice(0,200);
+  save('histDB',hist);
+
+  // 학습 컨텍스트 생성
+  var learnCtx=buildLearningContext(dis);
+  var stats=getLearningStats();
+
+  var sys='당신은 재난 대응 전문 AI입니다. 재난유형: '+dis
+    +'\n\n[지식 DB]\n'
+    +'특허: '+kb.patents.map(function(p){return p.id+' '+p.t;}).join(', ')+'\n'
+    +'논문: '+kb.papers.map(function(p){return p.id+' '+p.t;}).join(', ')+'\n'
+    +'법령: '+kb.laws.map(function(l){return l.t+' ('+l.d+')';}).join(', ')
+    +'\n\n[진화 수준: Lv.'+stats.evolveLevel+' | 누적상담 '+stats.totalConsult+'건 | 만족도 '+stats.satisfactionRate+'%]'
+    +learnCtx
+    +'\n\n[응답 형식]\n'
+    +'##ACTION: 즉각행동 요령 (번호 목록)\n'
+    +'##MEASURE: 조치사항 (법령 출처 포함)\n'
+    +'##EXPERT: 추천 전문가 분야\n'
+    +'##RND: R&D 필요 분야\n\n'
+    +'학습된 미흡 패턴을 반드시 보완하여 답변하세요. 출처는 위 DB의 ID를 명시하세요.';
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,
+        messages:[{role:'user',content:t}]})
+    });
+    var d=await res.json();
+    var reply=d.content&&d.content[0]?d.content[0].text:'응답 오류';
+    messages.push({role:'bot',text:reply,time:tnow(),isResult:true,dis:dis,kb:kb,stats:stats});
+  }catch(e){
+    messages.push({role:'bot',text:'API 오류. Claude API Key를 확인하세요.',time:tnow()});
+  }
+  busy=false;renderMessages();
+}
+
+function togglePlus(){
+  var popup=document.getElementById('plus-popup');
+  var btn=document.getElementById('plus-btn');
+  var isOpen=popup.classList.toggle('show');
+  btn.classList.toggle('open', isOpen);
+}
+
+function handlePhoto(e){
+  var f=e.target.files[0];
+  if(!f)return;
+  var reader=new FileReader();
+  reader.onload=function(ev){
+    messages.push({role:'user',text:'[사진 첨부]',imgUrl:ev.target.result,time:tnow()});
+    renderMessages();
+  };
+  reader.readAsDataURL(f);
+  e.target.value='';
+}
+
+var recognizing=false;
+function toggleVoice(){
+  var btn=document.getElementById('voice-btn');
+  if(!('webkitSpeechRecognition' in window||'SpeechRecognition' in window)){
+    alert('이 브라우저는 음성 입력을 지원하지 않습니다.');return;
+  }
+  if(recognizing){recognizing=false;btn.classList.remove('recording');btn.innerHTML='🎙 <span>음성</span>';return;}
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  var rec=new SR();
+  rec.lang='ko-KR';rec.interimResults=false;rec.maxAlternatives=1;
+  rec.onstart=function(){recognizing=true;btn.classList.add('recording');btn.innerHTML='🔴 <span>듣는 중...</span>';};
+  rec.onresult=function(e){
+    var txt=e.results[0][0].transcript;
+    document.getElementById('chat-input').value=txt;
+    updateSendBtn();
+  };
+  rec.onend=function(){recognizing=false;btn.classList.remove('recording');btn.innerHTML='🎙 <span>음성</span>';};
+  rec.onerror=function(){recognizing=false;btn.classList.remove('recording');btn.innerHTML='🎙 <span>음성</span>';};
+  rec.start();
+}
+
+function updateSendBtn(){
+  var v=document.getElementById('chat-input').value.trim();
+  var btn=document.getElementById('send-btn');
+  btn.classList.toggle('active',!!v&&!busy);
+}
+function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}}
+
+// ── 전문가
+function renderExperts(){
+  var tab=document.getElementById('experts-tab');
+  tab.innerHTML='';
+  var c=cats();
+  var list=EXPERTS.filter(function(e){return e.cats.some(function(cat){return c.includes(cat);});});
+  var cnt=document.createElement('div');cnt.className='expert-count';cnt.textContent='전문가 '+list.length+'명';tab.appendChild(cnt);
+  list.forEach(function(e){
+    var card=document.createElement('div');card.className='expert-card';
+    var av=document.createElement('div');av.className='expert-avatar';av.textContent=e.n[0];
+    var info=document.createElement('div');info.style.flex='1';
+    var tags=e.cats.map(function(c){var col=KB[c]?KB[c].col:'#00D4AA';return '<span class="expert-tag" style="background:'+col+'22;color:'+col+'">'+c+'</span>';}).join('');
+    info.innerHTML='<div class="expert-name">'+e.n+' <span class="expert-avail">✅</span></div><div class="expert-spec">'+e.s+'</div><div class="expert-meta">'+e.area+' · '+e.exp+'년</div><div class="expert-tags">'+tags+'</div>';
+    card.appendChild(av);card.appendChild(info);tab.appendChild(card);
+  });
+}
+
+// ── 피드백
+function renderFeedback(){
+  var tab=document.getElementById('feedback-tab');
+  tab.innerHTML='';
+  var fbs=getSaved('fbDB');
+  if(!fbs.length){tab.innerHTML='<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">아직 피드백이 없습니다.<br/>전문가 상담 후 피드백을 남겨보세요.</div></div>';return;}
+  fbs.forEach(function(fb){
+    var card=document.createElement('div');card.className='fb-card';
+    var col=KB[fb.disaster]?KB[fb.disaster].col:'#00D4AA';
+    card.innerHTML='<div class="fb-header"><span class="fb-name">'+fb.expert+'</span><span class="fb-date">'+fb.date+'</span></div>'
+      +'<div><span class="fb-dis" style="background:'+col+'">'+fb.disaster+'</span>'+fb.item+'</div>'
+      +'<div class="fb-rating">'+(fb.rating==='good'?'😊 만족':'😞 미흡')+'</div>'
+      +(fb.issues&&fb.issues.length?'<div class="fb-issues">미흡: '+fb.issues.join(', ')+'</div>':'')
+      +(fb.rnd?'<div class="rnd-badge">💡 R&D 제안: '+fb.disaster+'</div>':'');
+    tab.appendChild(card);
+  });
+}
+
+// ── 이력
+function renderHistory(){
+  var tab=document.getElementById('history-tab');
+  tab.innerHTML='';
+
+  // 학습 현황 대시보드
+  var stats=getLearningStats();
+  var dash=document.createElement('div');
+  dash.style.cssText='background:linear-gradient(135deg,#0f2040,#1a3050);border:1px solid #2d5a7b;border-radius:12px;padding:14px;margin-bottom:14px;';
+  dash.innerHTML='<div style="font-size:12px;font-weight:700;color:#00D4AA;margin-bottom:10px;">🧠 AI 학습 현황</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;">'
+    +statBox('📋','누적 상담',stats.totalConsult+'건','#60a5fa')
+    +statBox('😊','만족도',stats.satisfactionRate+'%','#00c875')
+    +statBox('🔬','R&D 등록',stats.rndCount+'건','#f97316')
+    +statBox('📚','추가 KB',stats.userKBCount+'건','#a78bfa')
+    +statBox('💬','피드백',stats.totalFeedback+'건','#fbbf24')
+    +statBox('🧬','진화 레벨','Lv.'+stats.evolveLevel,'#00D4AA')
+    +'</div>'
+    +'<div style="margin-top:10px;background:#0a1628;border-radius:6px;height:6px;overflow:hidden;">'
+    +'<div style="height:100%;width:'+Math.min(stats.evolveLevel*10,100)+'%;background:linear-gradient(90deg,#00D4AA,#0891b2);border-radius:6px;transition:.5s;"></div>'
+    +'</div>'
+    +'<div style="font-size:10px;color:#64748b;margin-top:4px;text-align:right;">다음 레벨까지 '+(10-((stats.totalFeedback+stats.rndCount*2+stats.userKBCount*3)%10))+'포인트</div>';
+  tab.appendChild(dash);
+
+  // 이력 목록
+  var hist=getSaved('histDB');
+  if(!hist.length){
+    var empty=document.createElement('div');
+    empty.style.cssText='text-align:center;padding:30px;color:#64748b;font-size:13px;';
+    empty.textContent='아직 상담 이력이 없습니다.';
+    tab.appendChild(empty);return;
+  }
+  hist.forEach(function(h){
+    var card=document.createElement('div');card.className='hist-card';
+    var col=KB[h.disaster]?KB[h.disaster].col:'#00D4AA';
+    card.innerHTML='<span class="hist-dis" style="background:'+col+'">'+h.disaster+'</span>'
+      +'<div class="hist-q">'+h.question+'</div>'
+      +'<div class="hist-date">'+h.date+'</div>';
+    tab.appendChild(card);
+  });
+}
+
+/* ══════════════════════════════════════
+   상황 보고서 시스템
+══════════════════════════════════════ */
+var reportSelections={period:'today',types:[],format:'standard'};
+
+function renderReport(){
+  var tab=document.getElementById('report-tab');
+  tab.innerHTML='';
+
+  // 제어판
+  var ctrl=document.createElement('div');
+  ctrl.className='report-ctrl';
+  ctrl.innerHTML='<div class="report-ctrl-title">📊 상황 보고서 생성</div>';
+
+  // 기간 선택
+  var p1=document.createElement('div');p1.style.cssText='font-size:11px;color:#64748b;margin-bottom:6px;';p1.textContent='▸ 보고 기간';
+  ctrl.appendChild(p1);
+  var periodRow=document.createElement('div');
+  periodRow.style.cssText='display:flex;gap:6px;margin-bottom:10px;';
+  [['today','오늘'],['week','이번 주'],['month','이달'],['all','전체']].forEach(function(p){
+    var btn=document.createElement('button');
+    btn.style.cssText='flex:1;padding:6px 0;border-radius:8px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;border:1px solid;';
+    var isSel=reportSelections.period===p[0];
+    btn.style.borderColor=isSel?'#00D4AA':'#2d5a7b';
+    btn.style.background=isSel?'rgba(0,212,170,.12)':'#0a1628';
+    btn.style.color=isSel?'#00D4AA':'#64748b';
+    btn.textContent=p[1];
+    btn.onclick=(function(key){return function(){
+      reportSelections.period=key;renderReport();
+    };})(p[0]);
+    periodRow.appendChild(btn);
+  });
+  ctrl.appendChild(periodRow);
+
+  // 재난 유형 선택
+  var p2=document.createElement('div');p2.style.cssText='font-size:11px;color:#64748b;margin-bottom:6px;';p2.textContent='▸ 재난 유형 (복수 선택)';
+  ctrl.appendChild(p2);
+  var typeGrid=document.createElement('div');
+  typeGrid.style.cssText='display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px;';
+  Object.keys(KB).forEach(function(k){
+    var kb=KB[k];
+    var btn=document.createElement('button');
+    var isSel=reportSelections.types.indexOf(k)>-1;
+    btn.style.cssText='padding:5px 4px;border-radius:6px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;border:1px solid;text-align:center;';
+    btn.style.borderColor=isSel?kb.col:'#2d5a7b';
+    btn.style.background=isSel?kb.col+'22':'#0a1628';
+    btn.style.color=isSel?kb.col:'#64748b';
+    btn.innerHTML=kb.icon+' '+k;
+    btn.onclick=(function(key){return function(){
+      var idx=reportSelections.types.indexOf(key);
+      if(idx>-1)reportSelections.types.splice(idx,1);
+      else reportSelections.types.push(key);
+      renderReport();
+    };})(k);
+    typeGrid.appendChild(btn);
+  });
+  ctrl.appendChild(typeGrid);
+
+  // 보고서 형식
+  var p3=document.createElement('div');p3.style.cssText='font-size:11px;color:#64748b;margin-bottom:6px;';p3.textContent='▸ 보고서 형식';
+  ctrl.appendChild(p3);
+  var fmtRow=document.createElement('div');
+  fmtRow.style.cssText='display:flex;gap:6px;margin-bottom:12px;';
+  [['standard','표준 보고서'],['brief','요약 보고서'],['rnd','R&D 중점'],['official','공문 형식']].forEach(function(f){
+    var btn=document.createElement('button');
+    var isSel=reportSelections.format===f[0];
+    btn.style.cssText='flex:1;padding:6px 2px;border-radius:8px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit;transition:.15s;border:1px solid;';
+    btn.style.borderColor=isSel?'#a78bfa':'#2d5a7b';
+    btn.style.background=isSel?'rgba(167,139,250,.12)':'#0a1628';
+    btn.style.color=isSel?'#a78bfa':'#64748b';
+    btn.textContent=f[1];
+    btn.onclick=(function(key){return function(){
+      reportSelections.format=key;renderReport();
+    };})(f[0]);
+    fmtRow.appendChild(btn);
+  });
+  ctrl.appendChild(fmtRow);
+
+  // 생성 버튼
+  var genBtn=document.createElement('button');
+  genBtn.className='report-gen-btn';
+  genBtn.textContent='📊 AI 보고서 생성';
+  genBtn.onclick=function(){generateReport(genBtn);};
+  ctrl.appendChild(genBtn);
+  tab.appendChild(ctrl);
+
+  // 기존 보고서 목록
+  var saved=getSaved('reportDB');
+  if(saved.length){
+    var listTitle=document.createElement('div');
+    listTitle.style.cssText='font-size:12px;font-weight:700;color:#64748b;margin:12px 0 8px;';
+    listTitle.textContent='저장된 보고서 ('+saved.length+'건)';
+    tab.appendChild(listTitle);
+    saved.slice(0,5).forEach(function(r){
+      var item=document.createElement('div');
+      item.style.cssText='background:#0f2040;border:1px solid #1e3a5f;border-radius:10px;padding:10px 12px;margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;';
+      item.innerHTML='<div><div style="font-size:12px;font-weight:700;color:#f1f5f9;">'+r.title+'</div>'
+        +'<div style="font-size:10px;color:#64748b;margin-top:2px;">'+r.date+' · '+r.format+'</div></div>'
+        +'<span style="font-size:18px;">📄</span>';
+      item.onclick=(function(report){return function(){showSavedReport(report);};})(r);
+      tab.appendChild(item);
+    });
+  }
+}
+
+async function generateReport(btn){
+  btn.disabled=true;btn.textContent='⏳ AI 보고서 작성 중...';
+  var tab=document.getElementById('report-tab');
+
+  // 데이터 수집
+  var hist=getSaved('histDB');
+  var fbs=getSaved('fbDB');
+  var rnds=getSaved('rndDB');
+  var userKB=getSaved('userKB');
+  var stats=getLearningStats();
+
+  // 기간 필터
+  var now=new Date();
+  var filtered=hist.filter(function(h){
+    var d=new Date(h.date);
+    if(reportSelections.period==='today')return h.date===now.toLocaleDateString('ko-KR');
+    if(reportSelections.period==='week'){var w=new Date(now);w.setDate(w.getDate()-7);return d>=w;}
+    if(reportSelections.period==='month'){var m=new Date(now);m.setMonth(m.getMonth()-1);return d>=m;}
+    return true;
+  });
+
+  // 유형 필터
+  if(reportSelections.types.length){
+    filtered=filtered.filter(function(h){return reportSelections.types.indexOf(h.disaster)>-1;});
+  }
+
+  // 통계 집계
+  var disCount={};
+  filtered.forEach(function(h){disCount[h.disaster]=(disCount[h.disaster]||0)+1;});
+  var fbFiltered=fbs.filter(function(f){
+    if(reportSelections.types.length&&reportSelections.types.indexOf(f.disaster)<0)return false;
+    return true;
+  });
+  var goodCnt=fbFiltered.filter(function(f){return f.rating==='good';}).length;
+  var badCnt=fbFiltered.filter(function(f){return f.rating==='bad';}).length;
+  var issueAgg={};
+  fbFiltered.forEach(function(f){if(f.issues)f.issues.forEach(function(i){issueAgg[i]=(issueAgg[i]||0)+1;});});
+  var topIssues=Object.entries(issueAgg).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+  var rndList=rnds.filter(function(r){return !reportSelections.types.length||reportSelections.types.indexOf(r.disaster)>-1;});
+
+  var periodLabel={'today':'오늘','week':'이번 주','month':'이달','all':'전체'}[reportSelections.period];
+  var formatLabel={'standard':'표준 보고서','brief':'요약 보고서','rnd':'R&D 중점 보고서','official':'공문 형식 보고서'}[reportSelections.format];
+
+  // AI 보고서 생성 프롬프트
+  var prompt='다음 재난 대응 플랫폼 데이터를 기반으로 '+formatLabel+'를 작성하세요.\n\n'
+    +'[보고 기간] '+periodLabel+' ('+now.toLocaleDateString('ko-KR')+')\n'
+    +'[총 상담 건수] '+filtered.length+'건\n'
+    +'[재난 유형별] '+Object.entries(disCount).map(function(e){return e[0]+' '+e[1]+'건';}).join(', ')+'\n'
+    +'[만족도] 만족 '+goodCnt+'건 / 미흡 '+badCnt+'건 (만족률 '+(fbFiltered.length?Math.round(goodCnt/fbFiltered.length*100):0)+'%)\n'
+    +'[주요 미흡 항목] '+topIssues.map(function(i){return i[0]+'('+i[1]+'건)';}).join(', ')+'\n'
+    +'[R&D 과제 등록] '+rndList.length+'건\n'
+    +'[현장 KB 추가] '+userKB.length+'건\n'
+    +'[AI 진화 레벨] Lv.'+stats.evolveLevel+'\n\n';
+
+  if(reportSelections.format==='official'){
+    prompt+='공문 형식으로 작성 (수신: 관련 기관, 제목, 본문 1~3항, 붙임 포함)\n';
+  } else if(reportSelections.format==='brief'){
+    prompt+='요약 형식 (300자 이내, 핵심 수치와 조치 사항만)\n';
+  } else if(reportSelections.format==='rnd'){
+    prompt+='R&D 과제 도출에 집중 (문제점→R&D 방향→기대효과 구조)\n';
+  } else {
+    prompt+='표준 보고서 형식: 1.개요 2.상황분석 3.대응현황 4.문제점 5.향후조치 6.R&D 제언\n';
+  }
+  prompt+='한국어로 전문적이고 간결하게 작성. 실제 수치를 반드시 포함.';
+
+  try{
+    var res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1500,
+        messages:[{role:'user',content:prompt}]})
+    });
+    var d=await res.json();
+    var reportText=d.content&&d.content[0]?d.content[0].text:'보고서 생성 오류';
+
+    // 보고서 저장
+    var title=periodLabel+' '+formatLabel+' ('+now.toLocaleDateString('ko-KR')+')';
+    var reportData={id:'RPT'+Date.now(),title:title,format:formatLabel,date:now.toLocaleDateString('ko-KR'),
+      content:reportText,stats:{total:filtered.length,good:goodCnt,bad:badCnt,rnd:rndList.length}};
+    var saved=getSaved('reportDB');saved.unshift(reportData);
+    if(saved.length>20)saved=saved.slice(0,20);
+    save('reportDB',saved);
+
+    showReportDoc(reportData, tab);
+  }catch(e){
+    btn.disabled=false;btn.textContent='📊 AI 보고서 생성';
+    alert('API 오류. API Key를 확인하세요.');
+    return;
+  }
+  btn.disabled=false;btn.textContent='📊 AI 보고서 생성';
+}
+
+function showReportDoc(r, container){
+  // 기존 보고서 제거
+  var old=document.getElementById('report-doc-area');
+  if(old)old.remove();
+
+  var wrap=document.createElement('div');
+  wrap.id='report-doc-area';
+  wrap.style.marginTop='8px';
+
+  var doc=document.createElement('div');
+  doc.className='report-doc';
+
+  // 헤더
+  doc.innerHTML='<h1>재난 대응 상황 보고서</h1>'
+    +'<div class="meta">작성일시: '+r.date+' &nbsp;|&nbsp; 형식: '+r.format+'<br>'
+    +'총 상담: '+r.stats.total+'건 &nbsp;|&nbsp; 만족률: '+(r.stats.total?Math.round(r.stats.good/(r.stats.good+r.stats.bad)*100)||0:0)+'% &nbsp;|&nbsp; R&D: '+r.stats.rnd+'건</div>';
+
+  // 본문 — 마크다운 → HTML 간단 변환
+  var body=r.content
+    .replace(/^#{1}\s(.+)$/gm,'<h2>$1</h2>')
+    .replace(/^#{2,3}\s(.+)$/gm,'<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
+    .replace(/^[-•]\s(.+)$/gm,'<li style="margin-left:14px">$1</li>')
+    .replace(/\n\n/g,'</p><p style="margin:6px 0">')
+    .replace(/\n/g,'<br>');
+  doc.innerHTML+=body;
+
+  // 액션 버튼
+  var actions=document.createElement('div');
+  actions.className='report-actions';
+
+  var printBtn=document.createElement('button');
+  printBtn.className='report-action-btn';printBtn.textContent='🖨️ 인쇄';
+  printBtn.onclick=function(){
+    var w=window.open('','_blank');
+    w.document.write('<html><head><title>재난 보고서</title><style>body{font-family:sans-serif;padding:30px;font-size:13px;line-height:1.7}h1{text-align:center}h2{border-bottom:2px solid #ccc;padding-bottom:4px}table{width:100%;border-collapse:collapse}td,th{border:1px solid #ccc;padding:6px}</style></head><body>'+doc.innerHTML+'</body></html>');
+    w.document.close();w.print();
+  };
+
+  var copyBtn=document.createElement('button');
+  copyBtn.className='report-action-btn';copyBtn.textContent='📋 복사';
+  copyBtn.onclick=function(){
+    navigator.clipboard.writeText(r.content).then(function(){
+      copyBtn.textContent='✅ 복사됨';setTimeout(function(){copyBtn.textContent='📋 복사';},2000);
+    });
+  };
+
+  var shareBtn=document.createElement('button');
+  shareBtn.className='report-action-btn';shareBtn.textContent='📤 공유';
+  shareBtn.onclick=function(){
+    if(navigator.share){navigator.share({title:'재난 상황 보고서',text:r.content});}
+    else{copyBtn.click();}
+  };
+
+  actions.appendChild(printBtn);actions.appendChild(copyBtn);actions.appendChild(shareBtn);
+
+  wrap.appendChild(doc);
+  wrap.appendChild(actions);
+  if(container){container.appendChild(wrap);}
+  else{document.getElementById('report-tab').appendChild(wrap);}
+}
+
+function showSavedReport(r){
+  var old=document.getElementById('report-doc-area');if(old)old.remove();
+  showReportDoc(r,null);
+  document.getElementById('report-doc-area').scrollIntoView({behavior:'smooth'});
+}
+
+function statBox(icon,label,val,col){
+  return '<div style="background:#0a1628;border-radius:8px;padding:8px;text-align:center;">'
+    +'<div style="font-size:16px;">'+icon+'</div>'
+    +'<div style="font-size:13px;font-weight:700;color:'+col+'">'+val+'</div>'
+    +'<div style="font-size:10px;color:#64748b;">'+label+'</div>'
+    +'</div>';
+}
+
+// ── 모달
+function openModal(dis, item){
+  modalDis=dis;modalItem=item;modalStep=1;modalRating='';modalIssues=[];
+  document.getElementById('modal-sub').textContent=dis+(item?' · '+item.t:'');
+  document.getElementById('modal-overlay').classList.add('show');
+  renderModal();
+}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('show');}
+function closeModalOutside(e){if(e.target===document.getElementById('modal-overlay'))closeModal();}
+
+function renderModal(){
+  var steps=document.querySelectorAll('.modal-step');
+  steps.forEach(function(s,i){s.classList.toggle('done',i<modalStep);});
+  var exp=EXPERTS.find(function(e){return e.cats.includes(modalDis);})||EXPERTS[0];
+  var body=document.getElementById('modal-body');
+  body.innerHTML='';
+  if(modalStep===1){
+    body.innerHTML='<div class="modal-expert-card"><div class="expert-avatar">'+exp.n[0]+'</div><div><div class="expert-name">'+exp.n+' <span style="font-size:11px;color:#00c875;">✅ 상담 가능</span></div><div class="expert-spec">'+exp.s+'</div><div style="font-size:11px;color:#64748b;margin-top:3px;">'+exp.area+' · 경력 '+exp.exp+'년</div></div></div>';
+    var btn=document.createElement('button');btn.className='confirm-btn';btn.textContent='상담 연결 →';
+    btn.onclick=function(){modalStep=2;renderModal();};
+    body.appendChild(btn);
+  } else if(modalStep===2){
+    var p=document.createElement('div');p.style.cssText='font-weight:700;color:#f1f5f9;margin-bottom:12px;';p.textContent='상담 만족도';body.appendChild(p);
+    var row=document.createElement('div');row.className='fb-btn-row';
+    [['😊 만족','#00c875','good'],['😞 미흡','#ff4757','bad']].forEach(function(b){
+      var btn=document.createElement('button');btn.className='fb-btn';
+      btn.style.cssText='border-color:'+b[1]+'44;background:'+b[1]+'11;color:'+b[1];
+      btn.textContent=b[0];
+      btn.onclick=function(){modalRating=b[2];if(b[2]==='good'){submitFeedback();modalStep=4;renderModal();}else{modalStep=3;renderModal();}};
+      row.appendChild(btn);
+    });
+    body.appendChild(row);
+  } else if(modalStep===3){
+    var p=document.createElement('div');p.style.cssText='font-weight:700;color:#f1f5f9;margin-bottom:8px;';p.textContent='미흡한 부분';body.appendChild(p);
+    var chips=document.createElement('div');chips.className='issue-chips';
+    ['전문성','정보','속도','매칭','기타'].forEach(function(iss){
+      var chip=document.createElement('button');chip.className='issue-chip'+(modalIssues.includes(iss)?' sel':'');
+      chip.textContent=iss;
+      chip.onclick=function(){
+        var idx=modalIssues.indexOf(iss);
+        if(idx>-1)modalIssues.splice(idx,1);else modalIssues.push(iss);
+        chip.classList.toggle('sel');
+      };
+      chips.appendChild(chip);
+    });
+    body.appendChild(chips);
+    var btn=document.createElement('button');btn.className='confirm-btn';btn.textContent='제출';
+    btn.onclick=function(){submitFeedback();modalStep=4;renderModal();};
+    body.appendChild(btn);
+  } else {
+    body.innerHTML='<div style="text-align:center;padding:20px 0"><div style="font-size:2.5rem;margin-bottom:12px">✅</div><div style="font-weight:700;color:#f1f5f9;margin-bottom:8px">피드백 감사합니다!</div>'
+      +(modalRating==='bad'&&modalIssues.length?'<div class="rnd-badge">💡 R&D 제안: '+modalDis+'</div>':'')+'</div>';
+    var btn=document.createElement('button');btn.className='confirm-btn';btn.textContent='닫기';
+    btn.onclick=closeModal;body.appendChild(btn);
+  }
+}
+
+function submitFeedback(){
+  var exp=EXPERTS.find(function(e){return e.cats.includes(modalDis);})||EXPERTS[0];
+  var fb={id:'FB'+Date.now(),disaster:modalDis,expert:exp.n,item:modalItem?modalItem.t:'',
+    rating:modalRating,issues:modalIssues.slice(),date:new Date().toLocaleDateString('ko-KR'),
+    rnd:modalRating==='bad'&&modalIssues.includes('정보')};
+  var fbs=getSaved('fbDB');fbs.unshift(fb);save('fbDB',fbs);
+}
+
+// ── 초기화
+renderDisBtns();
+renderChat();
+document.getElementById('content').style.display='flex';
+document.getElementById('content').style.flexDirection='column';
+document.getElementById('content').style.overflow='hidden';
+document.getElementById('content').style.flex='1';
 </script>
 </body>
 </html>
